@@ -57,7 +57,7 @@ struct DSLopSV
     ~DSLopSV();
 };
 
-DSLopSV::DSLopSV() 
+DSLopSV::DSLopSV()
 {
     nodes = new LopSV[capacity];
 }
@@ -124,6 +124,7 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
     return ketqua;
 }
 
+/*Tiến*/
 PTRSV SearchSV_MASV(PTRSV &FirstSV, string &msv)
 {
     for (PTRSV p = FirstSV; p != NULL; p = p->next)
@@ -190,7 +191,7 @@ void Nhap_DSSV(PTRSV &FirstSV)
             }
             q->next = p;
         }
-        cout << "Nhap ma sinh vien (=0 dung nhap): ";
+        cout << "Nhap ma sinh vien (0 la dung nhap): ";
     }
 }
 
@@ -241,7 +242,105 @@ void Them_LopTC(DSLopTC &DSLTC)
     ltc->DSDK = NULL;
     DSLTC.nodes[DSLTC.n] = ltc;
     DSLTC.n++;
-    cout << "Them lop tin chi thanh cong!" << endl;
+    cout << "Them lop tin chi thanh cong!\n";
+}
+
+LopTC *SearchLopTC_MALTC(DSLopTC &DSLTC)
+{
+    if (DSLTC.n == 0)
+    {
+        return NULL;
+    }
+    int mltc;
+    cout << "Nhap ma lop tin chi: ";
+    cin >> mltc;
+    LopTC *p;
+    for (int i = 0; i < DSLTC.n; i++)
+    {
+        p = DSLTC.nodes[i];
+        if (p->MALOPTC == mltc)
+            return p;
+    }
+    return NULL;
+}
+
+void HieuChinh_LopTC(DSLopTC &DSLTC)
+{
+    if (DSLTC.n == 0)
+    {
+        cout << "Danh sach lop tin chi rong!\n";
+        return;
+    }
+    LopTC *ltc = SearchLopTC_MALTC(DSLTC);
+    if (ltc == NULL)
+    {
+        cout << "Khong tim thay lop tin chi!\n";
+        return;
+    }
+    cout << "Nhap ma mon hoc: ";
+    cin >> ltc->MAMH;
+    cout << "Nhap nien khoa: ";
+    cin >> ltc->NIENKHOA;
+    cout << "Nhap hoc ky: ";
+    cin >> ltc->HOCKY;
+    cout << "Nhap nhom: ";
+    cin >> ltc->NHOM;
+    cout << "Nhap so luong sinh vien toi thieu: ";
+    cin >> ltc->MINSV;
+    cout << "Nhap so luong sinh vien toi da: ";
+    cin >> ltc->MAXSV;
+    cout << "Nhap huy lop (Y/N): ";
+    string huylop;
+    cin >> huylop;
+    if (strcasecmp(huylop.c_str(), "Y") == 0)
+        ltc->HUYLOP = true;
+    else
+        ltc->HUYLOP = false;
+    cout << "Hieu chinh lop tin chi thanh cong!\n";
+}
+
+void Xoa_LopTC(DSLopTC &DSLTC)
+{
+    if (DSLTC.n == 0)
+    {
+        cout << "Danh sach lop tin chi rong!\n";
+        return;
+    }
+    LopTC *ltc = SearchLopTC_MALTC(DSLTC);
+    if (ltc == NULL)
+    {
+        cout << "Khong tim thay lop tin chi!\n";
+        return;
+    }
+    cout << "Ban co chac chan muon xoa? (Y/N): ";
+    string xacnhan;
+    cin >> xacnhan;
+    if (strcasecmp(xacnhan.c_str(), "Y") != 0)
+    {
+        cout << "Da huy thao tac xoa!\n";
+        return;
+    }
+    int vitri = -1;
+    for (int i = 0; i < DSLTC.n; i++)
+    {
+        if (DSLTC.nodes[i] == ltc)
+        {
+            vitri = i;
+            break;
+        }
+    }
+    if (vitri == -1)
+    {
+        cout << "Lop tin chi khong ton tai!\n";
+        return;
+    }
+    delete DSLTC.nodes[vitri];
+    for (int i = vitri; i < DSLTC.n - 1; i++)
+    {
+        DSLTC.nodes[i] = DSLTC.nodes[i + 1];
+    }
+    DSLTC.n--;
+    cout << "Da xoa lop tin chi co ma " << ltc->MALOPTC << " thanh cong!\n";
 }
 
 void LietKe_LopTC(DSLopTC &DSLTC)
@@ -251,7 +350,7 @@ void LietKe_LopTC(DSLopTC &DSLTC)
         cout << "Danh sach lop tin chi rong!\n";
         return;
     }
-    cout << "DANH SACH LOP TIN CHI:\n";
+    cout << "--- DANH SACH LOP TIN CHI ---\n";
     cout << "-------------------------------------------------------------\n";
     cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tHuyLop\n";
     cout << "-------------------------------------------------------------\n";
@@ -261,6 +360,7 @@ void LietKe_LopTC(DSLopTC &DSLTC)
         cout << ltc->MALOPTC << "\t"
              << ltc->MAMH << "\t"
              << ltc->NIENKHOA << "\t"
+                                 "\t"
              << ltc->HOCKY << "\t"
              << ltc->NHOM << "\t"
              << ltc->MINSV << "\t"
@@ -268,6 +368,7 @@ void LietKe_LopTC(DSLopTC &DSLTC)
              << (ltc->HUYLOP ? "Yes" : "No") << endl;
     }
 }
+/*Tiến*/
 
 int Tim_LopSV(DSLopSV &DSLSV, string malop)
 {
@@ -284,18 +385,18 @@ void MoRong_DSLopSV(DSLopSV &DSLSV)
     int new_capacity = DSLSV.capacity * 2;
     if (new_capacity > MAX_LOPSV)
         new_capacity = MAX_LOPSV;
-    
+
     LopSV *new_nodes = new LopSV[new_capacity];
-    
+
     for (int i = 0; i < DSLSV.n; i++)
     {
         new_nodes[i] = DSLSV.nodes[i];
     }
-    
+
     delete[] DSLSV.nodes;
     DSLSV.nodes = new_nodes;
     DSLSV.capacity = new_capacity;
-    
+
     cout << "Da mo rong danh sach lop sinh vien! Kich thuoc moi: " << new_capacity << endl;
 }
 
@@ -306,33 +407,33 @@ void Them_LopSV(DSLopSV &DSLSV)
         cout << "Da dat gioi han toi da " << MAX_LOPSV << " lop sinh vien!\n";
         return;
     }
-    
+
     if (DSLSV.n >= DSLSV.capacity)
     {
         cout << "Mang da day! Dang mo rong...\n";
         MoRong_DSLopSV(DSLSV);
     }
-    
+
     string malop, tenlop;
     cout << "Nhap ma lop: ";
     cin >> malop;
     malop = ChuanHoa_Chuoi(malop, 15);
-    
+
     if (Tim_LopSV(DSLSV, malop) != -1)
     {
         cout << "Ma lop da ton tai!\n";
         return;
     }
-    
+
     cout << "Nhap ten lop: ";
     cin.ignore(1000, '\n');
     getline(cin, tenlop);
-    
+
     DSLSV.nodes[DSLSV.n].MALOP = malop;
     DSLSV.nodes[DSLSV.n].TENLOP = tenlop;
     DSLSV.nodes[DSLSV.n].FirstSV = NULL;
     DSLSV.n++;
-    
+
     cout << "Them lop sinh vien thanh cong!\n";
     cout << "So luong lop hien tai: " << DSLSV.n << "/" << DSLSV.capacity << endl;
 }
@@ -354,27 +455,27 @@ void Xoa_LopSV(DSLopSV &DSLSV)
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
-    
+
     string malop;
     cout << "Nhap ma lop can xoa: ";
     cin >> malop;
     malop = ChuanHoa_Chuoi(malop, 15);
-    
+
     int pos = Tim_LopSV(DSLSV, malop);
     if (pos == -1)
     {
         cout << "Khong tim thay lop!\n";
         return;
     }
-    
+
     Xoa_SV_LopSV(DSLSV.nodes[pos].FirstSV);
-    
+
     for (int i = pos; i < DSLSV.n - 1; i++)
     {
         DSLSV.nodes[i] = DSLSV.nodes[i + 1];
     }
     DSLSV.n--;
-    
+
     cout << "Xoa lop sinh vien thanh cong!\n";
 }
 
@@ -385,27 +486,27 @@ void HieuChinh_LopSV(DSLopSV &DSLSV)
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
-    
+
     string malop;
     cout << "Nhap ma lop can hieu chinh: ";
     cin >> malop;
     malop = ChuanHoa_Chuoi(malop, 15);
-    
+
     int pos = Tim_LopSV(DSLSV, malop);
     if (pos == -1)
     {
         cout << "Khong tim thay lop!\n";
         return;
     }
-    
+
     cout << "Thong tin hien tai:\n";
     cout << "Ma lop: " << DSLSV.nodes[pos].MALOP << "\n";
     cout << "Ten lop: " << DSLSV.nodes[pos].TENLOP << "\n";
-    
+
     cout << "Nhap ten lop moi: ";
     cin.ignore();
     getline(cin, DSLSV.nodes[pos].TENLOP);
-    
+
     cout << "Hieu chinh thanh cong!\n";
 }
 
@@ -416,19 +517,19 @@ void Nhap_SV_Lop(DSLopSV &DSLSV)
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
-    
+
     string malop;
     cout << "Nhap ma lop: ";
     cin >> malop;
     malop = ChuanHoa_Chuoi(malop, 15);
-    
+
     int pos = Tim_LopSV(DSLSV, malop);
     if (pos == -1)
     {
         cout << "Khong tim thay lop!\n";
         return;
     }
-    
+
     cout << "Nhap sinh vien vao lop " << DSLSV.nodes[pos].TENLOP << ":\n";
     Nhap_DSSV(DSLSV.nodes[pos].FirstSV);
 }
@@ -440,12 +541,12 @@ void LietKe_LopSV(DSLopSV &DSLSV)
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
-    
+
     cout << "DANH SACH LOP SINH VIEN:\n";
     cout << "-------------------------------------------------------------\n";
     cout << "STT\tMa Lop\t\tTen Lop\t\tSo SV\n";
     cout << "-------------------------------------------------------------\n";
-    
+
     for (int i = 0; i < DSLSV.n; i++)
     {
         int count = 0;
@@ -453,7 +554,7 @@ void LietKe_LopSV(DSLopSV &DSLSV)
         {
             count++;
         }
-        
+
         cout << (i + 1) << "\t"
              << DSLSV.nodes[i].MALOP << "\t\t"
              << DSLSV.nodes[i].TENLOP << "\t\t"
@@ -466,18 +567,22 @@ int SoSanh_Chuoi(const string &s1, const string &s2)
     int len1 = s1.length();
     int len2 = s2.length();
     int minLen = (len1 < len2) ? len1 : len2;
-    
+
     for (int i = 0; i < minLen; i++)
     {
         char c1 = tolower(s1[i]);
         char c2 = tolower(s2[i]);
-        
-        if (c1 < c2) return -1;
-        if (c1 > c2) return 1;
+
+        if (c1 < c2)
+            return -1;
+        if (c1 > c2)
+            return 1;
     }
-    
-    if (len1 < len2) return -1;
-    if (len1 > len2) return 1;
+
+    if (len1 < len2)
+        return -1;
+    if (len1 > len2)
+        return 1;
     return 0;
 }
 
@@ -486,7 +591,7 @@ bool SoSanh_TenHo(const SinhVien &sv1, const SinhVien &sv2)
     int result = SoSanh_Chuoi(sv1.TEN, sv2.TEN);
     if (result != 0)
         return result < 0;
-    
+
     return SoSanh_Chuoi(sv1.HO, sv2.HO) < 0;
 }
 
@@ -494,7 +599,7 @@ void SapXep_DSSV_TenHo(PTRSV &FirstSV)
 {
     if (FirstSV == NULL || FirstSV->next == NULL)
         return;
-    
+
     for (PTRSV i = FirstSV; i->next != NULL; i = i->next)
     {
         PTRSV min = i;
@@ -505,7 +610,7 @@ void SapXep_DSSV_TenHo(PTRSV &FirstSV)
                 min = j;
             }
         }
-        
+
         if (min != i)
         {
             SinhVien temp = i->sv;
@@ -522,32 +627,32 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
-    
+
     string malop;
     cout << "Nhap ma lop: ";
     cin >> malop;
     malop = ChuanHoa_Chuoi(malop, 15);
-    
+
     int pos = Tim_LopSV(DSLSV, malop);
     if (pos == -1)
     {
         cout << "Khong tim thay lop!\n";
         return;
     }
-    
+
     if (DSLSV.nodes[pos].FirstSV == NULL)
     {
         cout << "Lop khong co sinh vien nao!\n";
         return;
     }
-    
+
     SapXep_DSSV_TenHo(DSLSV.nodes[pos].FirstSV);
-    
+
     cout << "\nDANH SACH SINH VIEN LOP " << DSLSV.nodes[pos].TENLOP << " (sap xep theo ten+ho):\n";
     cout << "-------------------------------------------------------------\n";
     cout << "STT\tMaSV\t\tHo\t\tTen\t\tGioiTinh\tSoDT\t\tEmail\n";
     cout << "-------------------------------------------------------------\n";
-    
+
     int stt = 1;
     for (PTRSV p = DSLSV.nodes[pos].FirstSV; p != NULL; p = p->next)
     {
@@ -561,7 +666,6 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
         stt++;
     }
 }
-
 
 int main()
 {
@@ -580,11 +684,11 @@ int main()
         cout << "5. Nhap danh sach sinh vien\n";
         cout << "6. Liet ke danh sach sinh vien\n";
         cout << "7. Them lop sinh vien\n";
-		cout << "8. Xoa lop sinh vien\n";
-		cout << "9. Hieu chinh lop sinh vien\n";
-		cout << "10. Nhap sinh vien vao lop\n";
-		cout << "11. Liet ke lop sinh vien\n";
-		cout << "12. In DSSV lop sap xep theo ten+ho\n";
+        cout << "8. Xoa lop sinh vien\n";
+        cout << "9. Hieu chinh lop sinh vien\n";
+        cout << "10. Nhap sinh vien vao lop\n";
+        cout << "11. Liet ke lop sinh vien\n";
+        cout << "12. In DSSV lop sap xep theo ten+ho\n";
         cout << "0. Thoat\n";
         int choice;
         cout << "Nhap lua chon: ";
@@ -598,10 +702,10 @@ int main()
             LietKe_LopTC(DSLTC);
             break;
         case 3:
-            //Xoa_LopTC(DSLTC);
+            Xoa_LopTC(DSLTC);
             break;
         case 4:
-            //HieuChinh_LopTC(DSLTC);
+            HieuChinh_LopTC(DSLTC);
             break;
         case 5:
             Nhap_DSSV(FirstSV);
@@ -610,26 +714,26 @@ int main()
             LietKe_DSSV(FirstSV);
             break;
         case 7:
-        	Them_LopSV(DSLSV);
-        	break;
+            Them_LopSV(DSLSV);
+            break;
         case 8:
-        	Xoa_LopSV(DSLSV);
-        	break;
+            Xoa_LopSV(DSLSV);
+            break;
         case 9:
-        	HieuChinh_LopSV(DSLSV);
-        	break;
+            HieuChinh_LopSV(DSLSV);
+            break;
         case 10:
-        	Nhap_SV_Lop(DSLSV);
-        	break;
+            Nhap_SV_Lop(DSLSV);
+            break;
         case 11:
-        	LietKe_LopSV(DSLSV);
-        	break;
+            LietKe_LopSV(DSLSV);
+            break;
         case 12:
-        	In_DSSV_Lop_SapXep(DSLSV);
-        	break;
+            In_DSSV_Lop_SapXep(DSLSV);
+            break;
         case 13:
-        	Them_LopSV(DSLSV);
-        	break;
+            Them_LopSV(DSLSV);
+            break;
         case 0:
             check = false;
             break;
