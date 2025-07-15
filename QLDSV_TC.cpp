@@ -365,7 +365,7 @@ void GhiFile_DSMH(TreeMH &DSMH)
     ofstream out("DSMH.txt", ios::app);
     if (!out.is_open())
     {
-        cout << "Không mở được file DSMH.txt\n";
+        cout << "Khong the mo file DSMH.txt\n";
         return;
     }
     if (DSMH != NULL)
@@ -385,7 +385,7 @@ void GhiFile_DSLSV(DSLopSV &DSLSV)
     ofstream out("DSLSV.txt");
     if (!out.is_open())
     {
-        cout << "Khong mo duoc file DSLSV.txt\n";
+        cout << "Khong the mo file DSLSV.txt\n";
         return;
     }
     for (int i = 0; i < DSLSV.n; i++)
@@ -401,7 +401,7 @@ void GhiFile_DSLTC(DSLopTC &DSLTC)
     ofstream out("DSLTC.txt");
     if (!out.is_open())
     {
-        cout << "Khong mo duoc file DSLTC.txt\n";
+        cout << "Khong the mo file DSLTC.txt\n";
         return;
     }
     for (int i = 0; i < DSLTC.n; i++)
@@ -424,7 +424,7 @@ void GhiFile_DSSV(PTRSV &FirstSV)
     ofstream out("DSSV.txt");
     if (!out.is_open())
     {
-        cout << "Khong mo duoc file DSSV.txt\n";
+        cout << "Khong the mo file DSSV.txt\n";
         return;
     }
     for (PTRSV p = FirstSV; p != NULL; p = p->next)
@@ -444,7 +444,7 @@ void GhiFile_DSDK(PTRDK &FirstDK)
     ofstream out("DSDK.txt");
     if (!out.is_open())
     {
-        cout << "Khong mo duoc file DSDK.txt\n";
+        cout << "Khong the mo file DSDK.txt\n";
         return;
     }
     for (PTRDK p = FirstDK; p != NULL; p = p->next)
@@ -473,7 +473,7 @@ void DocFile_DSMH(TreeMH &DSMH)
     ifstream in("DSMH.txt");
     if (!in.is_open())
     {
-        cout << "Không thể mở file DSMH.txt\n";
+        cout << "Khong the mo file DSMH.txt\n";
         return;
     }
     string line;
@@ -499,7 +499,7 @@ void DocFile_DSSV(PTRSV &FirstSV)
     ifstream in("DSSV.txt");
     if (!in.is_open())
     {
-        cout << "Không thể mở file DSSV.txt\n";
+        cout << "Khong the mo file DSSV.txt\n";
         return;
     }
     string line;
@@ -545,7 +545,7 @@ void DocFile_DSLSV(DSLopSV &DSLSV)
     ifstream in("DSLSV.txt");
     if (!in.is_open())
     {
-        cout << "Không thể mở file DSLSV.txt\n";
+        cout << "Khong the mo file DSLSV.txt\n";
         return;
     }
     string line;
@@ -561,7 +561,7 @@ void DocFile_DSLSV(DSLopSV &DSLSV)
         lopsv.FirstSV = NULL;
         if (DSLSV.n >= DSLSV.capacity)
         {
-            cout << "Danh sách lớp sinh viên đã đầy!\n";
+            cout << "Danh sach lop sinh vien da day!\n";
             return;
         }
         DSLSV.nodes[DSLSV.n] = lopsv;
@@ -575,7 +575,7 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
     ifstream in("DSLTC.txt");
     if (!in.is_open())
     {
-        cout << "Không thể mở file DSLTC.txt\n";
+        cout << "Khong the mo file DSLTC.txt\n";
         return;
     }
     string line;
