@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -211,7 +213,7 @@ void LietKe_DSSV(PTRSV &FirstSV)
         cout << p->sv.MASV << "\t"
              << p->sv.HO << "\t"
              << p->sv.TEN << "\t"
-             << p->sv.GIOITINH << "\t"
+             << p->sv.GIOITINH << "\t\t"
              << p->sv.SODT << "\t"
              << p->sv.EMAIL << "\n";
     }
@@ -266,11 +268,6 @@ LopTC *SearchLopTC_MALTC(DSLopTC &DSLTC)
 
 void HieuChinh_LopTC(DSLopTC &DSLTC)
 {
-    if (DSLTC.n == 0)
-    {
-        cout << "Danh sach lop tin chi rong!\n";
-        return;
-    }
     LopTC *ltc = SearchLopTC_MALTC(DSLTC);
     if (ltc == NULL)
     {
@@ -301,11 +298,6 @@ void HieuChinh_LopTC(DSLopTC &DSLTC)
 
 void Xoa_LopTC(DSLopTC &DSLTC)
 {
-    if (DSLTC.n == 0)
-    {
-        cout << "Danh sach lop tin chi rong!\n";
-        return;
-    }
     LopTC *ltc = SearchLopTC_MALTC(DSLTC);
     if (ltc == NULL)
     {
@@ -345,11 +337,6 @@ void Xoa_LopTC(DSLopTC &DSLTC)
 
 void LietKe_LopTC(DSLopTC &DSLTC)
 {
-    if (DSLTC.n == 0)
-    {
-        cout << "Danh sach lop tin chi rong!\n";
-        return;
-    }
     cout << "--- DANH SACH LOP TIN CHI ---\n";
     cout << "-------------------------------------------------------------\n";
     cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tHuyLop\n";
@@ -367,6 +354,265 @@ void LietKe_LopTC(DSLopTC &DSLTC)
              << ltc->MAXSV << "\t"
              << (ltc->HUYLOP ? "Yes" : "No") << endl;
     }
+}
+
+void InDSSV_LopTC(DSLopTC &DSLTC)
+{
+}
+
+void GhiFile_DSMH(TreeMH &DSMH)
+{
+    ofstream out("DSMH.txt", ios::app);
+    if (!out.is_open())
+    {
+        cout << "Không mở được file DSMH.txt\n";
+        return;
+    }
+    if (DSMH != NULL)
+    {
+        out << DSMH->mh.MAMH << ","
+            << DSMH->mh.TENMH << ","
+            << DSMH->mh.STCLT << ","
+            << DSMH->mh.STCTH << "\n";
+        GhiFile_DSMH(DSMH->left);
+        GhiFile_DSMH(DSMH->right);
+    }
+    out.close();
+}
+
+void GhiFile_DSLSV(DSLopSV &DSLSV)
+{
+    ofstream out("DSLSV.txt");
+    if (!out.is_open())
+    {
+        cout << "Khong mo duoc file DSLSV.txt\n";
+        return;
+    }
+    for (int i = 0; i < DSLSV.n; i++)
+    {
+        out << DSLSV.nodes[i].MALOP << ","
+            << DSLSV.nodes[i].TENLOP << "\n";
+    }
+    out.close();
+}
+
+void GhiFile_DSLTC(DSLopTC &DSLTC)
+{
+    ofstream out("DSLTC.txt");
+    if (!out.is_open())
+    {
+        cout << "Khong mo duoc file DSLTC.txt\n";
+        return;
+    }
+    for (int i = 0; i < DSLTC.n; i++)
+    {
+        LopTC *ltc = DSLTC.nodes[i];
+        out << ltc->MALOPTC << ","
+            << ltc->MAMH << ","
+            << ltc->NIENKHOA << ","
+            << ltc->HOCKY << ","
+            << ltc->NHOM << ","
+            << ltc->MINSV << ","
+            << ltc->MAXSV << ","
+            << (ltc->HUYLOP ? "Yes" : "No") << "\n";
+    }
+    out.close();
+}
+
+void GhiFile_DSSV(PTRSV &FirstSV)
+{
+    ofstream out("DSSV.txt");
+    if (!out.is_open())
+    {
+        cout << "Khong mo duoc file DSSV.txt\n";
+        return;
+    }
+    for (PTRSV p = FirstSV; p != NULL; p = p->next)
+    {
+        out << p->sv.MASV << ","
+            << p->sv.HO << ","
+            << p->sv.TEN << ","
+            << p->sv.GIOITINH << ","
+            << p->sv.SODT << ","
+            << p->sv.EMAIL << "\n";
+    }
+    out.close();
+}
+
+void GhiFile_DSDK(PTRDK &FirstDK)
+{
+    ofstream out("DSDK.txt");
+    if (!out.is_open())
+    {
+        cout << "Khong mo duoc file DSDK.txt\n";
+        return;
+    }
+    for (PTRDK p = FirstDK; p != NULL; p = p->next)
+    {
+        out << p->dk.MASV << ","
+            << p->dk.DIEM << "\n";
+    }
+    out.close();
+}
+
+void GhiFile(TreeMH &DSMH, PTRSV &FirstSV, DSLopSV &DSLSV, DSLopTC &DSLTC)
+{
+    GhiFile_DSMH(DSMH);
+    GhiFile_DSSV(FirstSV);
+    GhiFile_DSLSV(DSLSV);
+    GhiFile_DSLTC(DSLTC);
+    for (int i = 0; i < DSLTC.n; i++)
+    {
+        GhiFile_DSDK(DSLTC.nodes[i]->DSDK);
+    }
+    cout << "Da ghi du lieu vao file thanh cong!\n";
+}
+
+void DocFile_DSMH(TreeMH &DSMH)
+{
+    ifstream in("DSMH.txt");
+    if (!in.is_open())
+    {
+        cout << "Không thể mở file DSMH.txt\n";
+        return;
+    }
+    string line;
+    while (getline(in, line))
+    {
+        stringstream ss(line);
+        string MAMH, TENMH, STCLT, STCTH;
+        getline(ss, MAMH, ',');
+        getline(ss, TENMH, ',');
+        getline(ss, STCLT, ',');
+        getline(ss, STCTH, ',');
+        MonHoc mh;
+        mh.MAMH = MAMH;
+        mh.TENMH = TENMH;
+        mh.STCLT = stoi(STCLT);
+        mh.STCTH = stoi(STCTH);
+    }
+    in.close();
+}
+
+void DocFile_DSSV(PTRSV &FirstSV)
+{
+    ifstream in("DSSV.txt");
+    if (!in.is_open())
+    {
+        cout << "Không thể mở file DSSV.txt\n";
+        return;
+    }
+    string line;
+    while (getline(in, line))
+    {
+        stringstream ss(line);
+        string MASV, HO, TEN, GIOITINH, SODT, EMAIL;
+        getline(ss, MASV, ',');
+        getline(ss, HO, ',');
+        getline(ss, TEN, ',');
+        getline(ss, GIOITINH, ',');
+        getline(ss, SODT, ',');
+        getline(ss, EMAIL, ',');
+        SinhVien sv;
+        sv.MASV = MASV;
+        sv.HO = HO;
+        sv.TEN = TEN;
+        sv.GIOITINH = GIOITINH;
+        sv.SODT = SODT;
+        sv.EMAIL = EMAIL;
+        PTRSV newSV = new NodeSV;
+        newSV->sv = sv;
+        newSV->next = NULL;
+        if (FirstSV == NULL)
+        {
+            FirstSV = newSV;
+        }
+        else
+        {
+            PTRSV temp = FirstSV;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = newSV;
+        }
+    }
+    in.close();
+}
+
+void DocFile_DSLSV(DSLopSV &DSLSV)
+{
+    ifstream in("DSLSV.txt");
+    if (!in.is_open())
+    {
+        cout << "Không thể mở file DSLSV.txt\n";
+        return;
+    }
+    string line;
+    while (getline(in, line))
+    {
+        stringstream ss(line);
+        string MALOP, TENLOP;
+        getline(ss, MALOP, ',');
+        getline(ss, TENLOP, ',');
+        LopSV lopsv;
+        lopsv.MALOP = MALOP;
+        lopsv.TENLOP = TENLOP;
+        lopsv.FirstSV = NULL;
+        if (DSLSV.n >= DSLSV.capacity)
+        {
+            cout << "Danh sách lớp sinh viên đã đầy!\n";
+            return;
+        }
+        DSLSV.nodes[DSLSV.n] = lopsv;
+        DSLSV.n++;
+    }
+    in.close();
+}
+
+void DocFile_DSLTC(DSLopTC &DSLTC)
+{
+    ifstream in("DSLTC.txt");
+    if (!in.is_open())
+    {
+        cout << "Không thể mở file DSLTC.txt\n";
+        return;
+    }
+    string line;
+    while (getline(in, line))
+    {
+        stringstream ss(line);
+        string MALOPTC, MAMH, NIENKHOA, HOCKY, NHOM, MINSV, MAXSV, HUYLOP;
+        getline(ss, MALOPTC, ',');
+        getline(ss, MAMH, ',');
+        getline(ss, NIENKHOA, ',');
+        getline(ss, HOCKY, ',');
+        getline(ss, NHOM, ',');
+        getline(ss, MINSV, ',');
+        getline(ss, MAXSV, ',');
+        getline(ss, HUYLOP, ',');
+        LopTC *ltc = new LopTC;
+        ltc->MALOPTC = stoi(MALOPTC);
+        ltc->MAMH = MAMH;
+        ltc->NIENKHOA = NIENKHOA;
+        ltc->HOCKY = stoi(HOCKY);
+        ltc->NHOM = stoi(NHOM);
+        ltc->MINSV = stoi(MINSV);
+        ltc->MAXSV = stoi(MAXSV);
+        ltc->HUYLOP = (HUYLOP == "Yes");
+        DSLTC.nodes[DSLTC.n] = ltc;
+        DSLTC.n++;
+    }
+    in.close();
+}
+
+void DocFile(TreeMH &DSMH, PTRSV &FirstSV, DSLopSV &DSLSV, DSLopTC &DSLTC)
+{
+    DocFile_DSMH(DSMH);
+    DocFile_DSSV(FirstSV);
+    DocFile_DSLSV(DSLSV);
+    DocFile_DSLTC(DSLTC);
+    cout << "Doc du lieu tu file thanh cong!\n";
 }
 /*Tiến*/
 
@@ -689,6 +935,9 @@ int main()
         cout << "10. Nhap sinh vien vao lop\n";
         cout << "11. Liet ke lop sinh vien\n";
         cout << "12. In DSSV lop sap xep theo ten+ho\n";
+        cout << "14. In DSSV da dang ky theo lop tin chi\n";
+        cout << "15. Doc file\n";
+        cout << "16. Ghi file\n";
         cout << "0. Thoat\n";
         int choice;
         cout << "Nhap lua chon: ";
@@ -733,6 +982,14 @@ int main()
             break;
         case 13:
             Them_LopSV(DSLSV);
+            break;
+        case 14:
+            break;
+        case 15:
+            DocFile(DSMH, FirstSV, DSLSV, DSLTC);
+            break;
+        case 16:
+            GhiFile(DSMH, FirstSV, DSLSV, DSLTC);
             break;
         case 0:
             check = false;
