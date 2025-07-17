@@ -490,6 +490,7 @@ void DocFile_DSMH(TreeMH &DSMH)
         mh.TENMH = TENMH;
         mh.STCLT = stoi(STCLT);
         mh.STCTH = stoi(STCTH);
+        ChenNodeMH(DSMH, mh);
     }
     in.close();
 }
