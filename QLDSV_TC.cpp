@@ -914,6 +914,257 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
     }
 }
 
+/*Tân*/
+ 
+NodeMH* TaoNodeMH(MonHoc mh) {
+    NodeMH* p = new NodeMH;
+    p->mh = mh;
+    p->left = NULL;
+    p->right = NULL;
+    return p;
+}
+
+void ChenNodeMH(TreeMH &DSMH, MonHoc mh) {
+    if (DSMH == NULL) {
+        DSMH = TaoNodeMH(mh);
+        return;
+    }
+    if (SoSanh_Chuoi(mh.MAMH, DSMH->mh.MAMH) < 0) {
+        ChenNodeMH(DSMH->left, mh);
+    } else if (SoSanh_Chuoi(mh.MAMH, DSMH->mh.MAMH) > 0) {
+        ChenNodeMH(DSMH->right, mh);
+    } else {
+        cout << "Ma mon hoc da ton tai!\n";
+    }
+}
+
+void Them_MonHoc(TreeMH &DSMH) {
+    MonHoc mh;
+    cout << "Nhap ma mon hoc: ";
+    cin >> mh.MAMH;
+    mh.MAMH = ChuanHoa_Chuoi(mh.MAMH, 10);
+    
+    // Ki?m tra trùng mă môn h?c
+    NodeMH* temp = DSMH;
+    while (temp != NULL) {
+        if (strcasecmp(temp->mh.MAMH.c_str(), mh.MAMH.c_str()) == 0) {
+            cout << "Ma mon hoc da ton tai!\n";
+            return;
+        }
+        if (SoSanh_Chuoi(mh.MAMH, temp->mh.MAMH) < 0)
+            temp = temp->left;
+        else
+            temp = temp->right;
+    }
+    
+    cout << "Nhap ten mon hoc: ";
+    cin.ignore(1000, '\n');
+    getline(cin, mh.TENMH);
+    mh.TENMH = ChuanHoa_Chuoi(mh.TENMH, 50);
+    cout << "Nhap so tin chi ly thuyet: ";
+    cin >> mh.STCLT;
+    cout << "Nhap so tin chi thuc hanh: ";
+    cin >> mh.STCTH;
+    
+    ChenNodeMH(DSMH, mh);
+    cout << "Thêm môn hoc thành công!\n";
+}
+	
+NodeMH* TimMH_MAMH(TreeMH DSMH, string mamh) {
+    if (DSMH == NULL) return NULL;
+    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0) return DSMH;
+    if (SoSanh_Chuoi(mamh, DSMH->mh.MAMH) < 0)
+        return TimMH_MAMH(DSMH->left, mamh);
+    return TimMH_MAMH(DSMH->right, mamh);
+}
+
+void HieuChinh_MonHoc(TreeMH &DSMH) {
+    if (DSMH == NULL) {
+        cout << "Danh sach mon hoc rong!\n";
+        return;
+    }
+    
+    string mamh;
+    cout << "Nhap ma mon hoc can hieu chinh: ";
+    cin >> mamh;
+    mamh = ChuanHoa_Chuoi(mamh, 10);
+    
+    NodeMH* node = TimMH_MAMH(DSMH, mamh);
+    if (node == NULL) {
+        cout << "Khong tim thay mon hoc!\n";
+        return;
+    }
+    
+    cout << "Thong tin hien tai:\n";
+    cout << "Ma mon hoc: " << node->mh.MAMH << "\n";
+    cout << "Ten mon hoc: " << node->mh.TENMH << "\n";
+    cout << "So tin chi ly thuyet: " << node->mh.STCLT << "\n";
+    cout << "So tin chi thuc hanh: " << node->mh.STCTH << "\n";
+    
+    cout << "Nhap ten mon hoc moi: ";
+    cin.ignore(1000, '\n');
+    getline(cin, node->mh.TENMH);
+    node->mh.TENMH = ChuanHoa_Chuoi(node->mh.TENMH, 50);
+    cout << "Nhap so tin chi ly thuyet moi: ";
+    cin >> node->mh.STCLT;
+    cout << "Nhap so tin chi thuc hanh moi: ";
+    cin >> node->mh.STCTH;
+    
+    cout << "Hieu chinh mon hoc thanh cong!\n";
+}
+
+NodeMH* TimMinMH(TreeMH DSMH) {
+    while (DSMH != NULL && DSMH->left != NULL)
+        DSMH = DSMH->left;
+    return DSMH;
+}
+
+void Xoa_MonHoc(TreeMH &DSMH) {
+    if (DSMH == NULL) {
+        cout << "Danh sach mon hoc rong!\n";
+        return;
+    }
+    
+    string mamh;
+    cout << "Nhap ma mon hoc can xoa: ";
+    cin >> mamh;
+    mamh = ChuanHoa_Chuoi(mamh, 10);
+    
+    NodeMH* parent = NULL;
+    NodeMH* current = DSMH;
+    while (current != NULL && strcasecmp(current->mh.MAMH.c_str(), mamh.c_str()) != 0) {
+        parent = current;
+        if (SoSanh_Chuoi(mamh, current->mh.MAMH) < 0)
+            current = current->left;
+        else
+            current = current->right;
+    }
+    
+    if (current == NULL) {
+        cout << "Khong tim thay ma mon hoc!\n";
+        return;
+    }
+    
+    cout << "Ban co chac chan muon xoa? (Y/N): ";
+    string xacnhan;
+    cin >> xacnhan;
+    if (strcasecmp(xacnhan.c_str(), "Y") != 0) {
+        cout << "Da huy thao tac!\n";
+        return;
+    }
+    
+    if (current->left == NULL) {
+        if (current == DSMH) {
+            DSMH = current->right;
+        } else if (parent->left == current) {
+            parent->left = current->right;
+        } else {
+            parent->right = current->right;
+        }
+        delete current;
+    } else if (current->right == NULL) {
+        if (current == DSMH) {
+            DSMH = current->left;
+        } else if (parent->left == current) {
+            parent->left = current->left;
+        } else {
+            parent->right = current->left;
+        }
+        delete current;
+    }
+    else {
+        NodeMH* minNode = TimMinMH(current->right);
+        current->mh = minNode->mh;
+        NodeMH* minParent = current;
+        NodeMH* minCurrent = current->right;
+        while (minCurrent != minNode) {
+            minParent = minCurrent;
+            minCurrent = minCurrent->left;
+        }
+        if (minParent->left == minCurrent)
+            minParent->left = minCurrent->right;
+        else
+            minParent->right = minCurrent->right;
+        delete minCurrent;
+    }
+    
+    cout << "Xoa mon hoc thanh cong!\n";
+    
+}
+
+// Luu tam thoi
+struct DSMHArray {
+    MonHoc *nodes;
+    int n;
+    int capacity;
+    
+    DSMHArray() {
+        capacity = 100;
+        nodes = new MonHoc[capacity];
+        n = 0;
+    }
+    
+    ~DSMHArray() {
+        delete[] nodes;
+    }
+    
+    void Them(MonHoc mh) {
+        if (n >= capacity) {
+            int new_capacity = capacity * 2;
+            MonHoc *new_nodes = new MonHoc[new_capacity];
+            for (int i = 0; i < n; i++) {
+                new_nodes[i] = nodes[i];
+            }
+            delete[] nodes;
+            nodes = new_nodes;
+            capacity = new_capacity;
+        }
+        nodes[n] = mh;
+        n++;
+    }
+};
+
+void ThuThapMH(TreeMH DSMH, DSMHArray &arr) {
+    if (DSMH != NULL) {
+        ThuThapMH(DSMH->left, arr);
+        arr.Them(DSMH->mh);
+        ThuThapMH(DSMH->right, arr);
+    }
+}
+
+void In_DSMH_SapXep(TreeMH DSMH) {
+    if (DSMH == NULL) {
+        cout << "Danh sach mon hoc rong!\n";
+        return;
+    }
+    
+    DSMHArray arr;
+    ThuThapMH(DSMH, arr);
+    
+    for (int i = 0; i < arr.n - 1; i++) {
+        for (int j = i + 1; j < arr.n; j++) {
+            if (SoSanh_Chuoi(arr.nodes[i].TENMH, arr.nodes[j].TENMH) > 0) {
+                MonHoc temp = arr.nodes[i];
+                arr.nodes[i] = arr.nodes[j];
+                arr.nodes[j] = temp;
+            }
+        }
+    }
+    
+    cout << "--- DANH SACH MON HOC (SAP XEP THEO TEN) ---\n";
+    cout << "-------------------------------------------------------------\n";
+    cout << "Ma MH\tTen Mon Hoc\t\t\tSTCLT\tSTCTH\n";
+    cout << "-------------------------------------------------------------\n";
+    for (int i = 0; i < arr.n; i++) {
+        cout << arr.nodes[i].MAMH << "\t"
+             << arr.nodes[i].TENMH;
+        for (size_t j = arr.nodes[i].TENMH.length(); j < 30; j++)
+            cout << " ";
+        cout << arr.nodes[i].STCLT << "\t"
+             << arr.nodes[i].STCTH << "\n";
+    }
+}
+
 int main()
 {
     DSLopTC DSLTC;
@@ -936,9 +1187,13 @@ int main()
         cout << "10. Nhap sinh vien vao lop\n";
         cout << "11. Liet ke lop sinh vien\n";
         cout << "12. In DSSV lop sap xep theo ten+ho\n";
-        cout << "14. In DSSV da dang ky theo lop tin chi\n";
-        cout << "15. Doc file\n";
-        cout << "16. Ghi file\n";
+        cout << "13. In DSSV da dang ky theo lop tin chi\n";
+        cout << "14. Them mon hoc\n";
+        cout << "15. Xoa mon hoc\n";
+        cout << "16. Hieu chinh mon hoc\n";
+        cout << "17. In danh sach môn hoc theo ten tang dan\n";
+        cout << "18. Doc file\n";
+        cout << "19. Ghi file\n";
         cout << "0. Thoat\n";
         int choice;
         cout << "Nhap lua chon: ";
@@ -985,11 +1240,21 @@ int main()
             Them_LopSV(DSLSV);
             break;
         case 14:
+        	Them_MonHoc(DSMH);
             break;
         case 15:
+        	Xoa_MonHoc(DSMH);
+        	break;
+        case 16:
+        	HieuChinh_MonHoc(DSMH);
+        	break;
+        case 17:
+        	In_DSMH_SapXep(DSMH);
+        	break;
+        case 18:
             DocFile(DSMH, FirstSV, DSLSV, DSLTC);
             break;
-        case 16:
+        case 19:
             GhiFile(DSMH, FirstSV, DSLSV, DSLTC);
             break;
         case 0:
