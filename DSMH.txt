@@ -1,0 +1,5 @@
+BAS1201,Dai So,35,0
+BAS1226,Xac Suat Thong Ke,25,0
+ELE1433,Ky Thuat So,24,2
+INT13162,Python,30,5
+INT1332,Java,30,5
