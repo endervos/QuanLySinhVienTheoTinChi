@@ -1,0 +1,6 @@
+N22DCAB,Cong Nghe Thong Tin AB
+N22DCAC,Cong Nghe Thong Tin AC
+N22DCAD,Cong Nghe Thong Tin AD
+N22KTDT,Ky Thuat Dien Tu
+N22CNTT,Cong Nghe Thong Tin
+N22KHMT,Khoa Hoc May Tinh

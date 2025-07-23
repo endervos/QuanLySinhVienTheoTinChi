@@ -767,6 +767,86 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
         stt++;
     }
 }
+
+void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+{
+	string mamh, nienkhoa;
+	int hocky, nhom;
+	cout << "Nhap ma mon hoc: ";
+	cin >> mamh;
+	cout << "Nhap nien khoa: ";
+	cin >> nienkhoa;
+	cout << "Nhap hoc ky: ";
+	cin >> hocky;
+	cout << "Nhap nhom: ";
+	cin >> nhom;
+	
+	LopTC *ltc = SearchLopTC(DSLTC, mamh, nienkhoa, hocky, nhom);
+	if (ltc == NULL)
+	{
+		cout << "Khong ton tai lop tin chi nay!\n";
+		return;
+	}
+	
+	if (ltc->DSDK == NULL)
+	{
+		cout << "Lop tin chi chua co sinh vien dang ky!\n";
+		return;
+	}
+	
+	string tenmh = SearchTenMH_MAMH(DSMH, mamh);
+	cout << "\nNHAP DIEM LOP TIN CHI\n";
+	cout << "Mon hoc: " << mamh << " - " << tenmh << "\n";
+    cout << "Nien khoa: " << nienkhoa << " - Hoc ky: " << hocky << " - Nhom: " << nhom << "\n";
+    
+    PTRDK p = ltc->DSDK;
+    PTRSV SV = NULL;
+    bool found = false;
+    float diem;
+    
+    while (p != NULL)
+    {
+    	SV = NULL;
+    	found = false;
+    	
+    	SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+    	if (SV != NULL) 
+    	{
+    		found = true;
+    	}
+		
+		cout << "\n--- Sinh vien ---\n";
+		cout << "Ma SV: " << p->dk.MASV;
+		
+		if (found && SV != NULL)
+        {
+            cout << " - " << SV->sv.HO << " " << SV->sv.TEN << "\n";
+        }
+        else
+        {
+            cout << "Khong tim thay sinh vien co ma " << p->dk.MASV << " trong danh sach sinh vien\n";
+        }
+        
+		cout << "Diem hien tai: " << (p->dk.DIEM > 0 ? to_string(p->dk.DIEM) : "Chua co diem") << "\n";
+        cout << "Nhap diem moi (0-10): ";
+        
+       	cin >> diem;
+        while (diem < 0 || diem > 10)
+        {
+            cout << "Diem khong hop le! Nhap lai (0-10): ";
+            cin >> diem;
+        }
+        
+        p->dk.DIEM = diem;
+        cout << "Da cap nhat diem thanh cong!\n";
+        cout << "--------------------------------\n";
+        
+        p = p->next;
+	}
+	
+	cout << "\nHoan thanh nhap diem cho lop tin chi!\n";
+}
+
 /*Tài*/
 
 /*Tân*/
@@ -1339,11 +1419,14 @@ int main()
         cout << "14. Them mon hoc\n";
         cout << "15. Xoa mon hoc\n";
         cout << "16. Hieu chinh mon hoc\n";
-        cout << "17. In danh sach môn hoc theo ten tang dan\n";
+        cout << "17. In danh sach mon hoc theo ten tang dan\n";
         cout << "18. Doc file\n";
         cout << "19. Ghi file\n";
         cout << "20. Dang ky lop tin chi\n";
         cout << "21. In DSSV da dang ky theo lop tin chi\n";
+        cout << "22. Nhap diem cho lop tin chi\n";
+        cout << "23. In diem trung binh cua 1 lop tin chi\n";
+        cout << "24. In bang diem sinh vien theo ma lop sinh vien\n";
         cout << "0. Thoat\n";
         int choice;
         cout << "Nhap lua chon: ";
@@ -1412,6 +1495,15 @@ int main()
             break;
         case 21:
             InDSSV_LopTC(DSLTC, FirstSV);
+            break;
+        case 22:
+            NhapDiem_LopTC(DSLTC, DSMH, FirstSV);
+            break;
+        case 23:
+            //InDiemTB_LopTC(DSLTC, DSMH);
+            break;
+        case 24:
+            //InBangDiem_SV_TheoLop(DSLSV, DSLTC, DSMH);
             break;
         case 0:
             check = false;
