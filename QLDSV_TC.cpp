@@ -2,6 +2,7 @@
 #include <string.h>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -795,30 +796,56 @@ void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
 	}
 	
 	string tenmh = SearchTenMH_MAMH(DSMH, mamh);
-	cout << "\nNHAP DIEM LOP TIN CHI\n";
-	cout << "Mon hoc: " << mamh << " - " << tenmh << "\n";
+	cout << "\nMon hoc: " << mamh << " - " << tenmh << "\n";
     cout << "Nien khoa: " << nienkhoa << " - Hoc ky: " << hocky << " - Nhom: " << nhom << "\n";
+    
+    cout << "\nSTT   MASV       HO             TEN        DIEM\n";
     
     PTRDK p = ltc->DSDK;
     PTRSV SV = NULL;
     bool found = false;
     float diem;
+    int stt = 1;
     
     while (p != NULL)
     {
-    	SV = NULL;
-    	found = false;
-    	
     	SV = SearchSV_MASV(FirstSV, p->dk.MASV);
-    	if (SV != NULL) 
+    	
+    	cout << setw(3) << stt << "   ";
+    	cout << setw(10) << left << p->dk.MASV << " ";
+    	
+    	if (SV != NULL)
     	{
-    		found = true;
+    		cout << setw(14) << left << SV->sv.HO << " ";
+    		cout << setw(10) << left << SV->sv.TEN << " ";
     	}
-		
+    	else
+    	{
+    		cout << setw(14) << left << "XXXXXXXXXXXX" << " ";
+    		cout << setw(10) << left << "XXXXX" << " ";
+    	}
+    	
+    	if (p->dk.DIEM > 0)
+    		cout << fixed << setprecision(1) << p->dk.DIEM;
+    	else
+    		cout << " ";
+    	
+    	cout << "\n";
+    	p = p->next;
+    	stt++;
+    }
+    
+    p = ltc->DSDK;
+    stt = 1;
+    
+    while (p != NULL)
+    {
+    	SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+    	
 		cout << "\n--- Sinh vien ---\n";
 		cout << "Ma SV: " << p->dk.MASV;
 		
-		if (found && SV != NULL)
+		if (SV != NULL)
         {
             cout << " - " << SV->sv.HO << " " << SV->sv.TEN << "\n";
         }
@@ -842,10 +869,81 @@ void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
         cout << "--------------------------------\n";
         
         p = p->next;
+        stt++;
 	}
 	
 	cout << "\nHoan thanh nhap diem cho lop tin chi!\n";
 }
+
+void InDiemTB_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+{
+    string mamh, nienkhoa;
+    int hocky, nhom;
+    cout << "Nhap ma mon hoc: ";
+    cin >> mamh;
+    cout << "Nhap nien khoa: ";
+    cin >> nienkhoa;
+    cout << "Nhap hoc ky: ";
+    cin >> hocky;
+    cout << "Nhap nhom: ";
+    cin >> nhom;
+    
+    LopTC *ltc = SearchLopTC(DSLTC, mamh, nienkhoa, hocky, nhom);
+    if (ltc == NULL)
+    {
+        cout << "Khong ton tai lop tin chi nay!\n";
+        return;
+    }
+    
+    if (ltc->DSDK == NULL)
+    {
+        cout << "Lop tin chi chua co sinh vien dang ky!\n";
+        return;
+    }
+    
+    string tenmh = SearchTenMH_MAMH(DSMH, mamh);
+    cout << "BANG THONG KE DIEM TRUNG BINH KHOA HOC\n";
+    cout << "Lop    : " << mamh << "\n\n";
+    
+    cout << "STT   MASV       HO             TEN          Diem TB\n";
+    
+    PTRDK p = ltc->DSDK;
+    PTRSV SV = NULL;
+    int stt = 1;
+    
+    while (p != NULL)
+    {
+        SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+        
+        cout << setw(3) << stt << "   ";
+        cout << setw(10) << left << p->dk.MASV << " ";
+        
+        if (SV != NULL)
+        {
+            cout << setw(14) << left << SV->sv.HO << " ";
+            cout << setw(12) << left << SV->sv.TEN << " ";
+        }
+        else
+        {
+            cout << setw(14) << left << "XXXXXXXXXXXX" << " ";
+            cout << setw(12) << left << "XXXXX" << " ";
+        }
+        
+        if (p->dk.DIEM > 0)
+        {
+            cout << fixed << setprecision(1) << p->dk.DIEM;
+        }
+        else
+        {
+            cout << " ";
+        }
+        
+        cout << "\n";
+        p = p->next;
+        stt++;
+    }
+}
+
 
 /*Tài*/
 
