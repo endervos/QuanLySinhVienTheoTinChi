@@ -628,13 +628,98 @@ void HieuChinh_LopSV(DSLopSV &DSLSV)
     cout << "Hieu chinh thanh cong!\n";
 }
 
-void Nhap_SV_Lop(DSLopSV &DSLSV)
+PTRSV Tim_SV_Theo_MASV(PTRSV DSSVGlobal, string masv)
+{
+    for (PTRSV p = DSSVGlobal; p != NULL; p = p->next)
+    {
+        if (p->sv.MASV == masv)
+        {
+            return p;
+        }
+    }
+    return NULL;
+}
+
+bool Kiem_Tra_SV_Ton_Tai(PTRSV FirstSV, string masv)
+{
+    for (PTRSV p = FirstSV; p != NULL; p = p->next)
+    {
+        if (p->sv.MASV == masv)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, PTRSV DSSVGlobal)
+{
+    string masv;
+    cout << "Nhap ma sinh vien (0 de dung nhap): ";
+    while (true)
+    {
+        cin >> masv;
+        
+        if (masv == "0")
+        {
+            break;
+        }
+        
+        masv = ChuanHoa_Chuoi(masv, 15);
+
+        PTRSV svTim = Tim_SV_Theo_MASV(DSSVGlobal, masv);
+        if (svTim == NULL)
+        {
+            cout << "Khong tim thay sinh vien co ma: " << masv << "\n";
+            cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+            continue;
+        }
+
+        if (Kiem_Tra_SV_Ton_Tai(FirstSV, masv))
+        {
+            cout << "Sinh vien da ton tai trong lop!\n";
+            cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+            continue;
+        }
+
+        PTRSV p = new NodeSV;
+        p->sv = svTim->sv; 
+        p->next = NULL;
+        
+        if (FirstSV == NULL)
+        {
+            FirstSV = p;
+        }
+        else
+        {
+            PTRSV q = FirstSV;
+            while (q->next != NULL)
+            {
+                q = q->next;
+            }
+            q->next = p;
+        }
+        
+        cout << "Da them sinh vien: " << svTim->sv.HO << " " << svTim->sv.TEN << "\n";
+        cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+    }
+}
+
+
+void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV DSSVGlobal)
 {
     if (DSLSV.n == 0)
     {
         cout << "Danh sach lop sinh vien rong!\n";
         return;
     }
+    
+    if (DSSVGlobal == NULL)
+    {
+        cout << "Danh sach sinh vien tong rong!\n";
+        return;
+    }
+    
     string malop;
     cout << "Nhap ma lop: ";
     cin >> malop;
@@ -646,8 +731,10 @@ void Nhap_SV_Lop(DSLopSV &DSLSV)
         return;
     }
     cout << "Nhap sinh vien vao lop " << DSLSV.nodes[pos].TENLOP << ":\n";
-    Nhap_DSSV(DSLSV.nodes[pos].FirstSV);
+    Nhap_DSSV_TheoMSSV(DSLSV.nodes[pos].FirstSV, DSSVGlobal);
 }
+
+
 
 void LietKe_LopSV(DSLopSV &DSLSV)
 {
@@ -874,76 +961,247 @@ void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
 	
 	cout << "\nHoan thanh nhap diem cho lop tin chi!\n";
 }
-
-void InDiemTB_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+/*
+void InDiemTB_KhoaHoc(DSLopSV &DSLSV, DSLopTC &DSLTC, TreeMH &DSMH)
 {
-    string mamh, nienkhoa;
-    int hocky, nhom;
-    cout << "Nhap ma mon hoc: ";
-    cin >> mamh;
-    cout << "Nhap nien khoa: ";
-    cin >> nienkhoa;
-    cout << "Nhap hoc ky: ";
-    cin >> hocky;
-    cout << "Nhap nhom: ";
-    cin >> nhom;
+    string malop;
+    cout << "Nhap ma lop sinh vien: ";
+    cin >> malop;
     
-    LopTC *ltc = SearchLopTC(DSLTC, mamh, nienkhoa, hocky, nhom);
-    if (ltc == NULL)
+    int indexLop = -1;
+    for (int i = 0; i < DSLSV.n; i++)
     {
-        cout << "Khong ton tai lop tin chi nay!\n";
+        if (DSLSV.nodes[i].MALOP == malop)
+        {
+            indexLop = i;
+            break;
+        }
+    }
+    
+    if (indexLop == -1)
+    {
+        cout << "Khong ton tai lop sinh vien nay!\n";
         return;
     }
     
-    if (ltc->DSDK == NULL)
+    if (DSLSV.nodes[indexLop].FirstSV == NULL)
     {
-        cout << "Lop tin chi chua co sinh vien dang ky!\n";
+        cout << "Lop sinh vien chua co sinh vien nao!\n";
         return;
     }
     
-    string tenmh = SearchTenMH_MAMH(DSMH, mamh);
     cout << "BANG THONG KE DIEM TRUNG BINH KHOA HOC\n";
-    cout << "Lop    : " << mamh << "\n\n";
+    cout << "Lop    : " << malop << "\n\n";
     
-    cout << "STT   MASV       HO             TEN          Diem TB\n";
+    cout << "| STT | MASV     |      HO       | TEN    | Diem TB |\n";
+    cout << "|-----|----------|---------------|--------|---------|\n";
     
-    PTRDK p = ltc->DSDK;
-    PTRSV SV = NULL;
+    PTRSV p = DSLSV.nodes[indexLop].FirstSV;
     int stt = 1;
     
     while (p != NULL)
     {
-        SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+        float tongDiem = 0;
+        int tongTinChi = 0;
+        int soMonCoDiem = 0;
         
-        cout << setw(3) << stt << "   ";
-        cout << setw(10) << left << p->dk.MASV << " ";
-        
-        if (SV != NULL)
+        for (int i = 0; i < DSLTC.n; i++)
         {
-            cout << setw(14) << left << SV->sv.HO << " ";
-            cout << setw(12) << left << SV->sv.TEN << " ";
+            if (DSLTC.nodes[i] != NULL && !DSLTC.nodes[i]->HUYLOP)
+            {
+                PTRDK dk = DSLTC.nodes[i]->DSDK;
+                while (dk != NULL)
+                {
+                    if (dk->dk.MASV == p->sv.MASV && dk->dk.DIEM > 0)
+                    {
+                        int stc = SearchSTC_MAMH(DSMH, DSLTC.nodes[i]->MAMH);
+                        if (stc > 0)
+                        {
+                            tongDiem += dk->dk.DIEM * stc;
+                            tongTinChi += stc;
+                            soMonCoDiem++;
+                        }
+                        break;
+                    }
+                    dk = dk->next;
+                }
+            }
+        }
+        
+        cout << "| " << setw(2) << stt << "  | ";
+        cout << setw(8) << left << p->sv.MASV << " | ";
+        cout << setw(13) << left << p->sv.HO << " | ";
+        cout << setw(6) << left << p->sv.TEN << " | ";
+        
+        if (tongTinChi > 0 && soMonCoDiem > 0)
+        {
+            float diemTB = tongDiem / tongTinChi;
+            cout << setw(6) << fixed << setprecision(1) << diemTB << " |";
         }
         else
         {
-            cout << setw(14) << left << "XXXXXXXXXXXX" << " ";
-            cout << setw(12) << left << "XXXXX" << " ";
-        }
-        
-        if (p->dk.DIEM > 0)
-        {
-            cout << fixed << setprecision(1) << p->dk.DIEM;
-        }
-        else
-        {
-            cout << " ";
+            cout << setw(6) << " " << " |";
         }
         
         cout << "\n";
         p = p->next;
         stt++;
     }
-}
+}*/
 
+void InDiemTongKet(DSLopSV &DSLSV, DSLopTC &DSLTC, TreeMH &DSMH)
+{
+    string malop;
+    cout << "Nhap ma lop sinh vien: ";
+    cin >> malop;
+    
+    int indexLop = -1;
+    for (int i = 0; i < DSLSV.n; i++)
+    {
+        if (DSLSV.nodes[i].MALOP == malop)
+        {
+            indexLop = i;
+            break;
+        }
+    }
+    
+    if (indexLop == -1)
+    {
+        cout << "Khong ton tai lop sinh vien nay!\n";
+        return;
+    }
+    
+    if (DSLSV.nodes[indexLop].FirstSV == NULL)
+    {
+        cout << "Lop sinh vien chua co sinh vien nao!\n";
+        return;
+    }
+    
+    string* danhSachMaMH = nullptr; 
+    int soMon = 0;
+    int capacity = 10;
+    
+    danhSachMaMH = new string[capacity];
+    
+    PTRSV p = DSLSV.nodes[indexLop].FirstSV;
+    while (p != NULL)
+    {
+        for (int i = 0; i < DSLTC.n; i++)
+        {
+            if (DSLTC.nodes[i] != NULL && !DSLTC.nodes[i]->HUYLOP)
+            {
+                PTRDK dk = DSLTC.nodes[i]->DSDK;
+                while (dk != NULL)
+                {
+                    if (dk->dk.MASV == p->sv.MASV && dk->dk.DIEM >= 0)
+                    {
+                        bool daTonTai = false;
+                        for (int j = 0; j < soMon; j++)
+                        {
+                            if (danhSachMaMH[j] == DSLTC.nodes[i]->MAMH)
+                            {
+                                daTonTai = true;
+                                break;
+                            }
+                        }
+                        if (!daTonTai)
+                        {
+                            if (soMon >= capacity)
+                            {
+                                capacity *= 2; 
+                                string* temp = new string[capacity];
+                        
+                                for (int k = 0; k < soMon; k++)
+                                {
+                                    temp[k] = danhSachMaMH[k];
+                                }
+                                delete[] danhSachMaMH; 
+                                danhSachMaMH = temp;
+                            }
+                            danhSachMaMH[soMon] = DSLTC.nodes[i]->MAMH;
+                            soMon++;
+                        }
+                        break;
+                    }
+                    dk = dk->next;
+                }
+            }
+        }
+        p = p->next;
+    }
+    
+    cout << "\n";
+    cout << setw(50) << "BANG DIEM TONG KET\n";
+    cout << setw(40) << "Lop : " << malop << "\n\n";
+    
+    cout << "| STT | Ma SV    | Ho Ten        |";
+    for (int i = 0; i < soMon; i++)
+    {
+        cout << " " << setw(6) << danhSachMaMH[i] << " |";
+    }
+    cout << "\n";
+    
+    cout << "|-----|----------|---------------|";
+    for (int i = 0; i < soMon; i++)
+    {
+        cout << "--------|";
+    }
+    cout << "\n";
+    
+    p = DSLSV.nodes[indexLop].FirstSV;
+    int stt = 1;
+    
+    while (p != NULL)
+    {
+        cout << "| " << setw(2) << stt << "  | ";
+        cout << setw(8) << left << p->sv.MASV << " | ";
+        
+        string hoTen = p->sv.HO + " " + p->sv.TEN;
+        cout << setw(13) << left << hoTen << " |";
+        
+
+        for (int i = 0; i < soMon; i++)
+        {
+            float diem = -1; 
+            bool timThay = false;
+            
+            for (int j = 0; j < DSLTC.n; j++)
+            {
+                if (DSLTC.nodes[j] != NULL && !DSLTC.nodes[j]->HUYLOP && 
+                    DSLTC.nodes[j]->MAMH == danhSachMaMH[i])
+                {
+                    PTRDK dk = DSLTC.nodes[j]->DSDK;
+                    while (dk != NULL)
+                    {
+                        if (dk->dk.MASV == p->sv.MASV)
+                        {
+                            diem = dk->dk.DIEM;
+                            timThay = true;
+                            break;
+                        }
+                        dk = dk->next;
+                    }
+                    if (timThay) break;
+                }
+            }
+            
+            if (timThay && diem >= 0)
+            {
+                cout << " " << setw(6) << fixed << setprecision(0) << diem << " |";
+            }
+            else
+            {
+                cout << " " << setw(6) << "" << " |";
+            }
+        }
+        
+        cout << "\n";
+        p = p->next;
+        stt++;
+    }
+    
+    delete[] danhSachMaMH;
+}
 
 /*Tài*/
 
@@ -1559,7 +1817,7 @@ int main()
             HieuChinh_LopSV(DSLSV);
             break;
         case 10:
-            Nhap_SV_Lop(DSLSV);
+            Nhap_SV_Lop(DSLSV, FirstSV);
             break;
         case 11:
             LietKe_LopSV(DSLSV);
@@ -1601,7 +1859,7 @@ int main()
             //InDiemTB_LopTC(DSLTC, DSMH);
             break;
         case 24:
-            //InBangDiem_SV_TheoLop(DSLSV, DSLTC, DSMH);
+            InDiemTongKet(DSLSV, DSLTC, DSMH);
             break;
         case 0:
             check = false;
