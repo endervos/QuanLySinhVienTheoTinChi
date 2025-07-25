@@ -1749,6 +1749,10 @@ void GhiFile(TreeMH &DSMH, PTRSV &FirstSV, DSLopSV &DSLSV, DSLopTC &DSLTC)
 }
 /*Ghi File*/
 
+void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+{
+
+}
 int main()
 {
     DSLopTC DSLTC;
@@ -1783,6 +1787,7 @@ int main()
         cout << "22. Nhap diem cho lop tin chi\n";
         cout << "23. In diem trung binh cua 1 lop tin chi\n";
         cout << "24. In bang diem sinh vien theo ma lop sinh vien\n";
+	cout << "25. In bang diem mon hoc cua lop tin chi\n";
         cout << "0. Thoat\n";
         int choice;
         cout << "Nhap lua chon: ";
@@ -1861,6 +1866,9 @@ int main()
         case 24:
             InDiemTongKet(DSLSV, DSLTC, DSMH);
             break;
+	case 25:
+		    InBangDiem_LopTC(DSLTC, DSMH, FirstSV);
+		    break;
         case 0:
             check = false;
             break;
