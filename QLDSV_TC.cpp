@@ -130,6 +130,39 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
     return ketqua;
 }
 
+string ChuanHoa_InputNangCao(string chuoi, int dodai, bool toUpper)
+{	
+	size_t start = 0;
+	while (start < chuoi.length() && isspace(static_cast<unsigned char>(chuoi[start])))
+	{
+		++start;
+	}
+	size_t end = chuoi.length();
+	while (end > start && isspace(static_cast<unsigned char>(chuoi[end - 1])))
+	    {
+			--end;
+		}
+	string tam = chuoi.substr(start, end - start);
+	string hopLe = "";
+	for (char c : tam)
+	{
+	    if (isalnum(c) || c == '-' || c == '_' || isspace(static_cast<unsigned char>(c)))
+	        hopLe += c;
+	}
+	stringstream ss(hopLe);
+	string word, ketqua;
+	while (ss >> word)
+	{
+	    if (!ketqua.empty()) ketqua += " ";
+	    ketqua += word;
+	}
+	if (toUpper)
+	{
+	    for (char &c : ketqua) c = toupper(c);
+	}
+	return ChuanHoa_Chuoi(ketqua, dodai);
+}
+
 bool KiemTra_SDT(string sdt)
 {
 if (sdt.length() != 10) return false;
