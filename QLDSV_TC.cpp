@@ -1715,6 +1715,46 @@ void GhiFile(TreeMH &DSMH, PTRSV &FirstSV, DSLopSV &DSLSV, DSLopTC &DSLTC)
 
 void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
 {
+     string mamh, nienkhoa;
+    int hocky, nhom;
+    cout << "Nhap ma mon hoc: ";
+    cin >> mamh;
+    cout << "Nhap nien khoa: ";
+    cin >> nienkhoa;
+    cout << "Nhap hoc ky: ";
+    cin >> hocky;
+    cout << "Nhap nhom: ";
+    cin >> nhom;
+
+    LopTC *ltc = SearchLopTC(DSLTC, mamh, nienkhoa, hocky, nhom);
+    if (ltc == NULL || ltc->HUYLOP)
+    {
+        cout << "Khong ton tai lop tin chi nay hoac da bi huy!\n";
+        return;
+    }
+
+    string tenmh = SearchTenMH_MAMH(DSMH, mamh);
+
+    cout << "\nBẢNG ĐIỂM MÔN HỌC: " << tenmh << "\n";
+    cout << "Niên khóa: " << nienkhoa << "  | Học kỳ: " << hocky << "  | Nhóm: " << nhom << "\n";
+    cout << "-------------------------------------------------------------\n";
+    cout << "STT  MASV        HO                 TEN        DIEM\n";
+    cout << "-------------------------------------------------------------\n";
+
+    int stt = 1;
+    for (PTRDK p = ltc->DSDK; p != NULL; p = p->next)
+    {
+        PTRSV sv = SearchSV_MASV(FirstSV, p->dk.MASV);
+        if (sv != NULL)
+        {
+            cout << setw(3) << stt << "  "
+                 << setw(10) << sv->sv.MASV << "  "
+                 << setw(18) << sv->sv.HO << "  "
+                 << setw(10) << sv->sv.TEN << "  "
+                 << fixed << setprecision(1) << p->dk.DIEM << "\n";
+        }
+        stt++;
+    }
 }
 int main()
 {
