@@ -139,6 +139,66 @@ PTRSV SearchSV_MASV(PTRSV &FirstSV, string msv)
     return NULL;
 }
 
+SinhVien Nhap_SV(PTRSV &FirstSV, SinhVien &sv)
+{
+    while (SearchSV_MASV(FirstSV, sv.MASV) != NULL)
+    {
+        cout << "Ma sinh vien da ton tai! Nhap lai ma sinh vien: ";
+        cin >> sv.MASV;
+        sv.MASV = ChuanHoa_Chuoi(sv.MASV, 15);
+    }
+    cout << "Nhap ho: ";
+    cin >> sv.HO;
+    sv.HO = ChuanHoa_Chuoi(sv.HO, 50);
+    cout << "Nhap ten: ";
+    cin >> sv.TEN;
+    sv.TEN = ChuanHoa_Chuoi(sv.TEN, 50);
+    cout << "Nhap gioi tinh: ";
+    cin >> sv.GIOITINH;
+    sv.GIOITINH = ChuanHoa_Chuoi(sv.GIOITINH, 4);
+    cout << "Nhap so dien thoai: ";
+    cin >> sv.SODT;
+    sv.SODT = ChuanHoa_Chuoi(sv.SODT, 10);
+    cout << "Nhap email: ";
+    cin >> sv.EMAIL;
+    sv.EMAIL = ChuanHoa_Chuoi(sv.EMAIL, 50);
+    cout << "Nhap thanh cong!\n";
+    return sv;
+}
+
+void Nhap_DSSV(PTRSV &FirstSV)
+{
+    SinhVien sv;
+    cout << "Nhap ma sinh vien (0 la dung nhap): ";
+    while (true)
+    {
+        cin >> sv.MASV;
+        if (sv.MASV == "")
+        {
+            break;
+        }
+        sv.MASV = ChuanHoa_Chuoi(sv.MASV, 15);
+        sv = Nhap_SV(FirstSV, sv);
+        PTRSV p = new NodeSV;
+        p->sv = sv;
+        p->next = NULL;
+        if (FirstSV == NULL)
+        {
+            FirstSV = p;
+        }
+        else
+        {
+            PTRSV q = FirstSV;
+            while (q->next != NULL)
+            {
+                q = q->next;
+            }
+            q->next = p;
+        }
+        cout << "Nhap ma sinh vien (de trong la dung nhap): ";
+    }
+}
+
 void LietKe_DSSV(PTRSV &FirstSV)
 {
     if (FirstSV == NULL)
@@ -281,7 +341,7 @@ void LietKe_LopTC(DSLopTC &DSLTC)
 {
     cout << "--- DANH SACH LOP TIN CHI ---\n";
     cout << "-------------------------------------------------------------\n";
-    cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tSoLuongSVDangKy\tHuyLop\n";
+    cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tHuyLop\n";
     cout << "-------------------------------------------------------------\n";
     for (int i = 0; i < DSLTC.n; i++)
     {
@@ -293,7 +353,6 @@ void LietKe_LopTC(DSLopTC &DSLTC)
              << ltc->NHOM << "\t"
              << ltc->MINSV << "\t"
              << ltc->MAXSV << "\t"
-             << ltc->SLSVDK << "\t\t"
              << (ltc->HUYLOP ? "Yes" : "No") << "\n";
     }
 }
@@ -1666,18 +1725,22 @@ void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
     cin >> hocky;
     cout << "Nhap nhom: ";
     cin >> nhom;
+
     LopTC *ltc = SearchLopTC(DSLTC, mamh, nienkhoa, hocky, nhom);
     if (ltc == NULL || ltc->HUYLOP)
     {
         cout << "Khong ton tai lop tin chi nay hoac da bi huy!\n";
         return;
     }
+
     string tenmh = SearchTenMH_MAMH(DSMH, mamh);
+
     cout << "\nBẢNG ĐIỂM MÔN HỌC: " << tenmh << "\n";
     cout << "Niên khóa: " << nienkhoa << "  | Học kỳ: " << hocky << "  | Nhóm: " << nhom << "\n";
     cout << "-------------------------------------------------------------\n";
     cout << "STT  MASV        HO                 TEN        DIEM\n";
     cout << "-------------------------------------------------------------\n";
+
     int stt = 1;
     for (PTRDK p = ltc->DSDK; p != NULL; p = p->next)
     {
@@ -1707,6 +1770,7 @@ int main()
         cout << "2. Liet ke lop tin chi\n";
         cout << "3. Xoa lop tin chi\n";
         cout << "4. Hieu chinh lop tin chi\n";
+        cout << "5. Nhap danh sach sinh vien\n";
         cout << "6. Liet ke danh sach sinh vien\n";
         cout << "7. Them lop sinh vien\n";
         cout << "8. Xoa lop sinh vien\n";
@@ -1746,6 +1810,7 @@ int main()
             HieuChinh_LopTC(DSLTC);
             break;
         case 5:
+            Nhap_DSSV(FirstSV);
             break;
         case 6:
             LietKe_DSSV(FirstSV);
