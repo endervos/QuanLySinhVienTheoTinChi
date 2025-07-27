@@ -1,5 +1,20 @@
+BAS1150,Triet Hoc Mac-Lenin,30,0
+BAS1153,Lich Su Dang CSVN,25,0
+BAS1157,Tieng Anh,25,0
 BAS1201,Dai So,35,0
-BAS1226,Xac Suat Thong Ke,25,0
+BAS1203,Giai Tich,30,0
+BAS1221,Phap Luat Dai Cuong,25,0
+BAS1226,Xac Suat Thong Ke,30,0
+ELE1404,Mach Dien,28,2
 ELE1433,Ky Thuat So,24,2
-INT13162,Python,30,5
+ELE1452,Ky Thuat Vi Mach,26,2
+ELE1478,Vi Xu Ly,30,2
+INT1155,Tin Hoc Co So,30,5
+INT1306,Cau Truc Du Lieu & Giai Thuat,32,4
+INT1313,Co So Du Lieu,30,5
+INT1319,He Dieu Hanh,28,4
+INT1328,Python,30,5
 INT1332,Java,30,5
+INT1336,Mang May Tinh,28,4
+TEL1502,Ky Thuat Truyen Dan,25,2
+TEL1505,He Thong Truyen Thong,30,2
