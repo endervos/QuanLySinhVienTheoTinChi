@@ -129,35 +129,40 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
 }
 
 /*Tiến*/
-PTRSV SearchSV_MASV(PTRSV &FirstSV, string msv)
+PTRSV SearchSV_MASV(DSLopSV &DSLSV, string msv)
 {
-    for (PTRSV p = FirstSV; p != NULL; p = p->next)
+    for (int i = 0; i < DSLSV.n; i++)
     {
-        if (strcasecmp(p->sv.MASV.c_str(), msv.c_str()) == 0)
-            return p;
+        PTRSV p = DSLSV.nodes[i].FirstSV;
+        while (p != NULL)
+        {
+            if (strcasecmp(p->sv.MASV.c_str(), msv.c_str()) == 0)
+            {
+                return p;
+            }
+            p = p->next;
+        }
     }
     return NULL;
 }
 
-void LietKe_DSSV(PTRSV &FirstSV)
+void LietKe_DSSV(DSLopSV &DSLSV)
 {
-    if (FirstSV == NULL)
+    cout << "--- DANH SACH SINH VIEN ---\n";
+    cout << "------------------------------------------------------------------------------\n";
+    cout << "MaSV\t\tHo\t\tTen\tGioiTinh\tSoDT\t\tEmail\n";
+    cout << "------------------------------------------------------------------------------\n";
+    for (int i = 0; i < DSLSV.n; i++)
     {
-        cout << "Danh sach rong!\n";
-        return;
-    }
-    cout << "DANH SACH SINH VIEN:\n";
-    cout << "-------------------------------------------------------------\n";
-    cout << "MaSV\tHo\tTen\tGioiTinh\tSoDT\tEmail\n";
-    cout << "-------------------------------------------------------------\n";
-    for (PTRSV p = FirstSV; p != NULL; p = p->next)
-    {
-        cout << p->sv.MASV << "\t"
-             << p->sv.HO << "\t"
-             << p->sv.TEN << "\t"
-             << p->sv.GIOITINH << "\t\t"
-             << p->sv.SODT << "\t"
-             << p->sv.EMAIL << "\n";
+        for (PTRSV p = DSLSV.nodes[i].FirstSV; p != NULL; p = p->next)
+        {
+            cout << p->sv.MASV << "\t"
+                 << p->sv.HO << "\t"
+                 << p->sv.TEN << "\t"
+                 << p->sv.GIOITINH << "\t\t"
+                 << p->sv.SODT << "\t"
+                 << p->sv.EMAIL << "\n";
+        }
     }
 }
 
@@ -280,9 +285,9 @@ void Xoa_LopTC(DSLopTC &DSLTC)
 void LietKe_LopTC(DSLopTC &DSLTC)
 {
     cout << "--- DANH SACH LOP TIN CHI ---\n";
-    cout << "-------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------------------------\n";
     cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tSoLuongSVDangKy\tHuyLop\n";
-    cout << "-------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------------------------\n";
     for (int i = 0; i < DSLTC.n; i++)
     {
         LopTC *ltc = DSLTC.nodes[i];
@@ -310,7 +315,7 @@ LopTC *SearchLopTC(DSLopTC &DSLTC, string mamh, string nienkhoa, int hocky, int 
     return NULL;
 }
 
-void InDSSV_LopTC(DSLopTC &DSLTC, PTRSV &FirstSV)
+void InDSSV_LopTC(DSLopTC &DSLTC, DSLopSV &DSLSV)
 {
     string mamh, nienkhoa;
     int hocky, nhom;
@@ -333,16 +338,17 @@ void InDSSV_LopTC(DSLopTC &DSLTC, PTRSV &FirstSV)
         cout << "Danh sach sinh vien rong!\n";
         return;
     }
-    cout << "DANH SACH SINH VIEN DANG KY LOP TIN CHI\n";
-    cout << "-------------------------------------------------------------\n";
-    cout << "MASV\t\tHO\t\tTEN\tGIOITINH\tSO DT\t\tEMAIL\n";
+    cout << "--- DANH SACH SINH VIEN DANG KY LOP " << mamh << " - HOC KY " << hocky << " - NIEN KHOA " << nienkhoa << " - NHOM " << nhom << " ---\n";
+    cout << "----------------------------------------------------------------------------------------------------\n";
+    cout << "MaSV\t\tHo\t\tTen\t\tGioiTinh\tSo DT\t\tEmail\n";
+    cout << "----------------------------------------------------------------------------------------------------\n";
     NodeDK *p = ltc->DSDK;
     while (p != NULL)
     {
-        PTRSV node = SearchSV_MASV(FirstSV, p->dk.MASV);
+        PTRSV node = SearchSV_MASV(DSLSV, p->dk.MASV);
         if (node != NULL)
         {
-            cout << node->sv.MASV << "\t" << node->sv.HO << "\t\t" << node->sv.TEN << "\t" << node->sv.GIOITINH << "\t\t" << node->sv.SODT << "\t" << node->sv.EMAIL << "\n";
+            cout << node->sv.MASV << "\t" << node->sv.HO << "\t" << node->sv.TEN << "\t\t" << node->sv.GIOITINH << "\t\t" << node->sv.SODT << "\t" << node->sv.EMAIL << "\n";
         }
         p = p->next;
     }
@@ -368,12 +374,12 @@ string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
     }
 }
 
-void DangKy_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+void DangKy_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, DSLopSV &DSLSV)
 {
     string masv;
     cout << "Nhap ma sinh vien: ";
     cin >> masv;
-    PTRSV p = SearchSV_MASV(FirstSV, masv);
+    PTRSV p = SearchSV_MASV(DSLSV, masv);
     if (p == NULL)
     {
         cout << "Khong tim thay sinh vien!\n";
@@ -395,15 +401,25 @@ void DangKy_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
     cout << "Nhap hoc ky: ";
     cin >> hocky;
     cout << "DANH SACH LOP TIN CHI - NIEN KHOA " << nienkhoa << " - HOC KY " << hocky << "\n";
-    cout << "-------------------------------------------------------------\n";
-    cout << "MaMH\tTenMH\t\tNhom\tSo SV Da DK\tCon Trong\n";
+    cout << "-----------------------------------------------------------------------------\n";
+    cout << left
+         << setw(10) << "MaMH"
+         << setw(35) << "TenMH"
+         << setw(8) << "Nhom"
+         << setw(15) << "So SV Da DK"
+         << setw(10) << "Con Trong" << "\n";
     for (int i = 0; i < DSLTC.n; i++)
     {
         LopTC *ltc = DSLTC.nodes[i];
         if (strcasecmp(ltc->NIENKHOA.c_str(), nienkhoa.c_str()) == 0 && ltc->HOCKY == hocky && ltc->HUYLOP == false)
         {
             string tenmh = SearchTenMH_MAMH(DSMH, ltc->MAMH);
-            cout << ltc->MAMH << "\t" << tenmh << "\t\t" << ltc->NHOM << "\t" << ltc->SLSVDK << "\t\t" << ltc->MAXSV - ltc->SLSVDK << "\n";
+            cout << left
+                 << setw(10) << ltc->MAMH
+                 << setw(35) << tenmh
+                 << setw(8) << ltc->NHOM
+                 << setw(15) << ltc->SLSVDK
+                 << setw(10) << (ltc->MAXSV - ltc->SLSVDK) << "\n";
         }
     }
     cout << "--- Nhap thong tin dang ky mon hoc ---\n";
@@ -775,25 +791,25 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
         return;
     }
     SapXep_DSSV_TenHo(DSLSV.nodes[pos].FirstSV);
-    cout << "\nDANH SACH SINH VIEN LOP " << DSLSV.nodes[pos].TENLOP << " (sap xep theo ten+ho):\n";
+    cout << "--- DANH SACH SINH VIEN LOP " << DSLSV.nodes[pos].TENLOP << " (sap xep theo ten+ho) ---\n";
     cout << "-------------------------------------------------------------\n";
-    cout << "STT\tMaSV\t\tHo\t\tTen\t\tGioiTinh\tSoDT\t\tEmail\n";
+    cout << "STT\tMaSV\t\tHo\t\tTen\tGioiTinh\tSoDT\t\tEmail\n";
     cout << "-------------------------------------------------------------\n";
     int stt = 1;
     for (PTRSV p = DSLSV.nodes[pos].FirstSV; p != NULL; p = p->next)
     {
         cout << stt << "\t"
-             << p->sv.MASV << "\t\t"
-             << p->sv.HO << "\t\t"
-             << p->sv.TEN << "\t\t"
+             << p->sv.MASV << "\t"
+             << p->sv.HO << "\t"
+             << p->sv.TEN << "\t"
              << p->sv.GIOITINH << "\t\t"
-             << p->sv.SODT << "\t\t"
+             << p->sv.SODT << "\t"
              << p->sv.EMAIL << "\n";
         stt++;
     }
 }
 
-void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, DSLopSV &DSLSV)
 {
     string mamh, nienkhoa;
     int hocky, nhom;
@@ -827,7 +843,7 @@ void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
     int stt = 1;
     while (p != NULL)
     {
-        SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+        SV = SearchSV_MASV(DSLSV, p->dk.MASV);
         cout << setw(3) << stt << "   ";
         cout << setw(10) << left << p->dk.MASV << " ";
         if (SV != NULL)
@@ -852,7 +868,7 @@ void NhapDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
     stt = 1;
     while (p != NULL)
     {
-        SV = SearchSV_MASV(FirstSV, p->dk.MASV);
+        SV = SearchSV_MASV(DSLSV, p->dk.MASV);
         cout << "\n--- Sinh vien ---\n";
         cout << "Ma SV: " << p->dk.MASV;
         if (SV != NULL)
@@ -1363,21 +1379,24 @@ void In_DSMH_SapXep(TreeMH DSMH)
         }
     }
     cout << "--- DANH SACH MON HOC (SAP XEP THEO TEN) ---\n";
-    cout << "-------------------------------------------------------------\n";
-    cout << "Ma MH\t\tTen Mon Hoc\t\t\tSTCLT\tSTCTH\n";
-    cout << "-------------------------------------------------------------\n";
+    cout << "----------------------------------------------------------\n";
+    cout << left
+         << setw(10) << "Ma MH"
+         << setw(35) << "Ten Mon Hoc"
+         << setw(8) << "STCLT"
+         << setw(8) << "STCTH" << "\n";
+    cout << "----------------------------------------------------------\n";
     for (int i = 0; i < arr.n; i++)
     {
-        cout << arr.nodes[i].MAMH << "\t\t"
-             << arr.nodes[i].TENMH;
-        for (size_t j = arr.nodes[i].TENMH.length(); j < 30; j++)
-            cout << " ";
-        cout << arr.nodes[i].STCLT << "\t"
-             << arr.nodes[i].STCTH << "\n";
+        cout << left
+             << setw(10) << arr.nodes[i].MAMH
+             << setw(35) << arr.nodes[i].TENMH
+             << setw(8) << arr.nodes[i].STCLT
+             << setw(8) << arr.nodes[i].STCTH << "\n";
     }
 }
 
-void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
+void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, DSLopSV &DSLSV)
 {
     string mamh, nienkhoa;
     int hocky, nhom;
@@ -1404,7 +1423,7 @@ void InBangDiem_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, PTRSV &FirstSV)
     int stt = 1;
     for (PTRDK p = ltc->DSDK; p != NULL; p = p->next)
     {
-        PTRSV sv = SearchSV_MASV(FirstSV, p->dk.MASV);
+        PTRSV sv = SearchSV_MASV(DSLSV, p->dk.MASV);
         if (sv != NULL)
         {
             cout << setw(3) << stt << "  "
@@ -1527,7 +1546,8 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
     LopTC *ltc = NULL;
     while (getline(in, line))
     {
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
         stringstream ss(line);
         string firstToken;
         getline(ss, firstToken, ',');
@@ -1560,7 +1580,7 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
         }
         else if (ltc != NULL)
         {
-            string MASV = firstToken;
+            string MASV = firstToken.substr(5);
             string DIEM_STR;
             getline(ss, DIEM_STR, ',');
             float DIEM = stof(DIEM_STR);
@@ -1568,8 +1588,17 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
             newNode->dk.MASV = MASV;
             newNode->dk.DIEM = DIEM;
             newNode->next = NULL;
-            newNode->next = ltc->DSDK;
-            ltc->DSDK = newNode;
+            if (ltc->DSDK == NULL)
+            {
+                ltc->DSDK = newNode;
+            }
+            else
+            {
+                PTRDK last = ltc->DSDK;
+                while (last->next != NULL)
+                    last = last->next;
+                last->next = newNode;
+            }
         }
     }
     in.close();
@@ -1750,7 +1779,7 @@ int main()
         case 5:
             break;
         case 6:
-            LietKe_DSSV(FirstSV);
+            LietKe_DSSV(DSLSV);
             break;
         case 7:
             Them_LopSV(DSLSV);
@@ -1792,13 +1821,13 @@ int main()
             GhiFile(DSMH, FirstSV, DSLSV, DSLTC);
             break;
         case 20:
-            DangKy_LopTC(DSLTC, DSMH, FirstSV);
+            DangKy_LopTC(DSLTC, DSMH, DSLSV);
             break;
         case 21:
-            InDSSV_LopTC(DSLTC, FirstSV);
+            InDSSV_LopTC(DSLTC, DSLSV);
             break;
         case 22:
-            NhapDiem_LopTC(DSLTC, DSMH, FirstSV);
+            NhapDiem_LopTC(DSLTC, DSMH, DSLSV);
             break;
         case 23:
             // InDiemTB_LopTC(DSLTC, DSMH);
@@ -1807,7 +1836,7 @@ int main()
             InDiemTongKet(DSLSV, DSLTC, DSMH);
             break;
         case 25:
-            InBangDiem_LopTC(DSLTC, DSMH, FirstSV);
+            InBangDiem_LopTC(DSLTC, DSMH, DSLSV);
             break;
         case 0:
             check = false;
