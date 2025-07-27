@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <cctype>
+#include <conio.h>
 
 using namespace std;
 
@@ -126,6 +128,29 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
         return chuoi;
     }
     return ketqua;
+}
+
+bool KiemTra_SDT(string sdt)
+{
+if (sdt.length() != 10) return false;
+for (char c : sdt)
+if (!isdigit(c)) return false;
+return true;
+}
+
+bool KiemTra_Email(string email)
+{
+size_t at = email.find('@');
+size_t dot = email.find('.', at);
+return at != string::npos && dot != string::npos && dot > at;
+}
+
+bool KiemTra_TrungMaSV(PTRSV FirstSV, string masv)
+{
+    for (PTRSV p = FirstSV; p != NULL; p = p->next)
+        if (strcasecmp(p->sv.MASV.c_str(), masv.c_str()) == 0)
+            return true;
+    return false;
 }
 
 /*Tiến*/
