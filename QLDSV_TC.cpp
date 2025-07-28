@@ -367,7 +367,13 @@ string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
 
 void LietKe_LopTC(DSLopTC &DSLTC, TreeMH &DSMH)
 {
-    cout << "--- DANH SACH LOP TIN CHI ---\n";
+    string nienkhoa;
+    cout << "Nhap nien khoa: ";
+    cin >> nienkhoa;
+    int hocky;
+    cout << "Nhap hoc ky: ";
+    cin >> hocky;
+    cout << "--- DANH SACH LOP TIN CHI - Nien Khoa: " << nienkhoa << ", Hoc Ky: " << hocky << " ---\n";
     cout << "------------------------------------------------------------------------------------------------------------------\n";
     cout << left
          << setw(8) << "MaLTC"
@@ -385,19 +391,22 @@ void LietKe_LopTC(DSLopTC &DSLTC, TreeMH &DSMH)
     for (int i = 0; i < DSLTC.n; i++)
     {
         LopTC *ltc = DSLTC.nodes[i];
-        string tenmh = SearchTenMH_MAMH(DSMH, ltc->MAMH);
-        cout << left
-             << setw(8) << ltc->MALOPTC
-             << setw(10) << ltc->MAMH
-             << setw(35) << tenmh
-             << setw(12) << ltc->NIENKHOA
-             << setw(7) << ltc->HOCKY
-             << setw(6) << ltc->NHOM
-             << setw(7) << ltc->MINSV
-             << setw(7) << ltc->MAXSV
-             << setw(16) << ltc->SLSVDK
-             << setw(8) << (ltc->HUYLOP ? "Yes" : "No")
-             << "\n";
+        if (ltc->NIENKHOA == nienkhoa && ltc->HOCKY == hocky)
+        {
+            string tenmh = SearchTenMH_MAMH(DSMH, ltc->MAMH);
+            cout << left
+                 << setw(8) << ltc->MALOPTC
+                 << setw(10) << ltc->MAMH
+                 << setw(35) << tenmh
+                 << setw(12) << ltc->NIENKHOA
+                 << setw(7) << ltc->HOCKY
+                 << setw(6) << ltc->NHOM
+                 << setw(7) << ltc->MINSV
+                 << setw(7) << ltc->MAXSV
+                 << setw(16) << ltc->SLSVDK
+                 << setw(8) << (ltc->HUYLOP ? "Yes" : "No")
+                 << "\n";
+        }
     }
 }
 
