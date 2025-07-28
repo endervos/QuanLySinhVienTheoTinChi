@@ -1723,112 +1723,102 @@ void DocFile(TreeMH &DSMH, DSLopSV &DSLSV, DSLopTC &DSLTC)
 /*Doc File*/
 
 /*Ghi File*/
+int DemSoMonHoc(TreeMH DSMH)
+{
+    if (DSMH == NULL)
+        return 0;
+    return 1 + DemSoMonHoc(DSMH->left) + DemSoMonHoc(DSMH->right);
+}
+
+void GhiDSMH_NLR(TreeMH DSMH, ofstream &out)
+{
+    if (DSMH == NULL)
+        return;
+    out << DSMH->mh.MAMH << ","
+        << DSMH->mh.TENMH << ","
+        << DSMH->mh.STCLT << ","
+        << DSMH->mh.STCTH << "\n";
+    GhiDSMH_NLR(DSMH->left, out);
+    GhiDSMH_NLR(DSMH->right, out);
+}
+
 void GhiFile_DSMH(TreeMH &DSMH)
 {
-    ofstream out("DSMH.txt", ios::app);
+    ofstream out("DSMH_Temp.txt");
     if (!out.is_open())
     {
-        cout << "Khong the mo file DSMH.txt\n";
+        cout << "Khong the mo file DSMH_Temp.txt\n";
         return;
     }
-    if (DSMH != NULL)
-    {
-        out << DSMH->mh.MAMH << ","
-            << DSMH->mh.TENMH << ","
-            << DSMH->mh.STCLT << ","
-            << DSMH->mh.STCTH << "\n";
-        GhiFile_DSMH(DSMH->left);
-        GhiFile_DSMH(DSMH->right);
-    }
+    int soMonHoc = DemSoMonHoc(DSMH);
+    out << soMonHoc << "\n";
+    GhiDSMH_NLR(DSMH, out);
     out.close();
 }
 
 void GhiFile_DSLSV(DSLopSV &DSLSV)
 {
-    ofstream out("DSLSV.txt");
+    ofstream out("DSLSV_Temp.txt");
     if (!out.is_open())
     {
-        cout << "Khong the mo file DSLSV.txt\n";
+        cout << "Khong the mo file DSLSV_Temp.txt\n";
         return;
     }
+    out << DSLSV.n << "\n";
     for (int i = 0; i < DSLSV.n; i++)
     {
-        out << DSLSV.nodes[i].MALOP << ","
-            << DSLSV.nodes[i].TENLOP << "\n";
+        LopSV &lop = DSLSV.nodes[i];
+        out << lop.MALOP << "," << lop.TENLOP << "\n";
+        out << "     " << lop.SLSV << "\n";
+        for (PTRSV p = lop.FirstSV; p != NULL; p = p->next)
+        {
+            SinhVien &sv = p->sv;
+            out << "     "
+                << sv.MASV << ","
+                << sv.HO << ","
+                << sv.TEN << ","
+                << sv.GIOITINH << ","
+                << sv.SODT << ","
+                << sv.EMAIL << "\n";
+        }
     }
     out.close();
 }
 
 void GhiFile_DSLTC(DSLopTC &DSLTC)
 {
-    ofstream out("DSLTC.txt");
+    ofstream out("DSLTC_Temp.txt");
     if (!out.is_open())
     {
-        cout << "Khong the mo file DSLTC.txt\n";
+        cout << "Khong the mo file DSLTC_Temp.txt\n";
         return;
     }
-    for (int i = 0; i < DSLTC.n; i++)
+    out << DSLTC.n << "\n";
+    for (int i = 0; i < DSLTC.n; ++i)
     {
         LopTC *ltc = DSLTC.nodes[i];
-        out << ltc->MALOPTC << ","
-            << ltc->MAMH << ","
-            << ltc->NIENKHOA << ","
-            << ltc->HOCKY << ","
-            << ltc->NHOM << ","
-            << ltc->MINSV << ","
-            << ltc->MAXSV << ","
-            << ltc->SLSVDK << ","
-            << (ltc->HUYLOP ? "Yes" : "No") << "\n";
+        out << ltc->MALOPTC << "," << ltc->MAMH << "," << ltc->NIENKHOA << "," << ltc->HOCKY << "," << ltc->NHOM << ","
+            << ltc->MINSV << "," << ltc->MAXSV << "," << (ltc->HUYLOP ? "Yes" : "No") << "\n";
+        int countSV = 0;
+        for (PTRDK p = ltc->DSDK; p != NULL; p = p->next)
+            countSV++;
+        out << "     " << countSV << "\n";
+        PTRDK p = ltc->DSDK;
+        int stt = 1;
+        while (p != NULL)
+        {
+            out << "     " << stt++ << p->dk.MASV << "," << fixed << setprecision(1) << p->dk.DIEM << "\n";
+            p = p->next;
+        }
     }
     out.close();
 }
 
-void GhiFile_DSSV(PTRSV &FirstSV)
-{
-    ofstream out("DSSV.txt");
-    if (!out.is_open())
-    {
-        cout << "Khong the mo file DSSV.txt\n";
-        return;
-    }
-    for (PTRSV p = FirstSV; p != NULL; p = p->next)
-    {
-        out << p->sv.MASV << ","
-            << p->sv.HO << ","
-            << p->sv.TEN << ","
-            << p->sv.GIOITINH << ","
-            << p->sv.SODT << ","
-            << p->sv.EMAIL << "\n";
-    }
-    out.close();
-}
-
-void GhiFile_DSDK(PTRDK &FirstDK)
-{
-    ofstream out("DSDK.txt");
-    if (!out.is_open())
-    {
-        cout << "Khong the mo file DSDK.txt\n";
-        return;
-    }
-    for (PTRDK p = FirstDK; p != NULL; p = p->next)
-    {
-        out << p->dk.MASV << ","
-            << p->dk.DIEM << "\n";
-    }
-    out.close();
-}
-
-void GhiFile(TreeMH &DSMH, PTRSV &FirstSV, DSLopSV &DSLSV, DSLopTC &DSLTC)
+void GhiFile(TreeMH &DSMH, DSLopSV &DSLSV, DSLopTC &DSLTC)
 {
     GhiFile_DSMH(DSMH);
-    GhiFile_DSSV(FirstSV);
     GhiFile_DSLSV(DSLSV);
     GhiFile_DSLTC(DSLTC);
-    for (int i = 0; i < DSLTC.n; i++)
-    {
-        GhiFile_DSDK(DSLTC.nodes[i]->DSDK);
-    }
     cout << "Da ghi du lieu vao file thanh cong!\n";
 }
 /*Ghi File*/
@@ -1927,7 +1917,7 @@ int main()
             DocFile(DSMH, DSLSV, DSLTC);
             break;
         case 19:
-            GhiFile(DSMH, FirstSV, DSLSV, DSLTC);
+            GhiFile(DSMH, DSLSV, DSLTC);
             break;
         case 20:
             DangKy_LopTC(DSLTC, DSMH, DSLSV);

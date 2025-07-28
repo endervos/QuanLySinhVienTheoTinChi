@@ -1,0 +1,25 @@
+5
+D22CNTT,Cong Nghe Thong Tin
+     10
+     N22CNTT001,Nguyen Van,An,Nam,0224451789,n22cntt001@gmail.com
+     N22CNTT002,Le Tran Ngoc,Bich,Nu,0987654321,n22cntt002@gmail.com
+     N22CNTT003,Tran Van,Cuong,Nam,0912345678,n22cntt003@gmail.com
+     N22CNTT004,Pham Thi,Dieu,Nu,0934567890,n22cntt004@gmail.com
+     N22CNTT005,Hoang Van,Em,Nam,0961234567,n22cntt005@gmail.com
+     N22CNTT006,Nguyen Thi,Phuong,Nu,0909876543,n22cntt006@gmail.com
+     N22CNTT007,Ngo Minh,Giang,Nu,0962172843,n22cntt007@gmail.com
+     N22CNTT008,Vo Hoang,Hai,Nam,0123456789,n22cntt008@gmail.com
+     N22CNTT009,Dang Thi,Lan,Nu,0987123456,n22cntt009@gmail.com
+     N22CNTT010,Bui Nguyen,Khang,Nam,0901234567,n22cntt010@gmail.com
+D22KTMT,Ky Thuat May Tinh
+     0
+D22CNVV,Cong Nghe Van Vat
+     0
+D22DTVT,Dien Tu Vien Thong
+     0
+D22KTDT,Ky Thuat Dien Tu
+     4
+     N22KTDT001,Nguyen Van,Linh,Nam,0901122334,n22ktdt001@gmail.com
+     N22KTDT002,Le Thi Thu,Huong,Nu,0911223344,n22ktdt002@gmail.com
+     N22KTDT003,Tran Van,Khoa,Nam,0922334455,n22ktdt003@gmail.com
+     N22KTDT004,Pham Thi,Trang,Nu,0933445566,n22ktdt004@gmail.com
