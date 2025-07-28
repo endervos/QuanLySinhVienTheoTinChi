@@ -1648,7 +1648,7 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
         if (!getline(in, line))
             break;
         stringstream ss(line);
-        string MALOPTC, MAMH, NIENKHOA, HOCKY, NHOM, MINSV, MAXSV, SLSVDK, HUYLOP;
+        string MALOPTC, MAMH, NIENKHOA, HOCKY, NHOM, MINSV, MAXSV, HUYLOP;
         getline(ss, MALOPTC, ',');
         getline(ss, MAMH, ',');
         getline(ss, NIENKHOA, ',');
@@ -1656,7 +1656,6 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
         getline(ss, NHOM, ',');
         getline(ss, MINSV, ',');
         getline(ss, MAXSV, ',');
-        getline(ss, SLSVDK, ',');
         getline(ss, HUYLOP, ',');
         LopTC *ltc = new LopTC;
         ltc->MALOPTC = stoi(MALOPTC);
@@ -1666,12 +1665,13 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
         ltc->NHOM = stoi(NHOM);
         ltc->MINSV = stoi(MINSV);
         ltc->MAXSV = stoi(MAXSV);
-        ltc->SLSVDK = stoi(SLSVDK);
+        ltc->SLSVDK = 0;
         ltc->HUYLOP = (HUYLOP == "Yes");
         ltc->DSDK = NULL;
         if (!getline(in, line))
             break;
         int soSV = stoi(line);
+        ltc->SLSVDK = soSV;
         for (int j = 0; j < soSV; ++j)
         {
             if (!getline(in, line))
