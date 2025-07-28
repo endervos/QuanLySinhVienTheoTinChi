@@ -48,6 +48,7 @@ struct LopSV
 {
     string MALOP;
     string TENLOP;
+    int SLSV = 0;
     PTRSV FirstSV = NULL;
 };
 
@@ -131,51 +132,55 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
 }
 
 string ChuanHoa_InputNangCao(string chuoi, int dodai, bool toUpper)
-{	
-	size_t start = 0;
-	while (start < chuoi.length() && isspace(static_cast<unsigned char>(chuoi[start])))
-	{
-		++start;
-	}
-	size_t end = chuoi.length();
-	while (end > start && isspace(static_cast<unsigned char>(chuoi[end - 1])))
-	    {
-			--end;
-		}
-	string tam = chuoi.substr(start, end - start);
-	string hopLe = "";
-	for (char c : tam)
-	{
-	    if (isalnum(c) || c == '-' || c == '_' || isspace(static_cast<unsigned char>(c)))
-	        hopLe += c;
-	}
-	stringstream ss(hopLe);
-	string word, ketqua;
-	while (ss >> word)
-	{
-	    if (!ketqua.empty()) ketqua += " ";
-	    ketqua += word;
-	}
-	if (toUpper)
-	{
-	    for (char &c : ketqua) c = toupper(c);
-	}
-	return ChuanHoa_Chuoi(ketqua, dodai);
+{
+    size_t start = 0;
+    while (start < chuoi.length() && isspace(static_cast<unsigned char>(chuoi[start])))
+    {
+        ++start;
+    }
+    size_t end = chuoi.length();
+    while (end > start && isspace(static_cast<unsigned char>(chuoi[end - 1])))
+    {
+        --end;
+    }
+    string tam = chuoi.substr(start, end - start);
+    string hopLe = "";
+    for (char c : tam)
+    {
+        if (isalnum(c) || c == '-' || c == '_' || isspace(static_cast<unsigned char>(c)))
+            hopLe += c;
+    }
+    stringstream ss(hopLe);
+    string word, ketqua;
+    while (ss >> word)
+    {
+        if (!ketqua.empty())
+            ketqua += " ";
+        ketqua += word;
+    }
+    if (toUpper)
+    {
+        for (char &c : ketqua)
+            c = toupper(c);
+    }
+    return ChuanHoa_Chuoi(ketqua, dodai);
 }
 
 bool KiemTra_SDT(string sdt)
 {
-if (sdt.length() != 10) return false;
-for (char c : sdt)
-if (!isdigit(c)) return false;
-return true;
+    if (sdt.length() != 10)
+        return false;
+    for (char c : sdt)
+        if (!isdigit(c))
+            return false;
+    return true;
 }
 
 bool KiemTra_Email(string email)
 {
-size_t at = email.find('@');
-size_t dot = email.find('.', at);
-return at != string::npos && dot != string::npos && dot > at;
+    size_t at = email.find('@');
+    size_t dot = email.find('.', at);
+    return at != string::npos && dot != string::npos && dot > at;
 }
 
 bool KiemTra_TrungMaSV(PTRSV FirstSV, string masv)
@@ -340,24 +345,59 @@ void Xoa_LopTC(DSLopTC &DSLTC)
     cout << "Da xoa lop tin chi co ma " << ltc->MALOPTC << " thanh cong!\n";
 }
 
-void LietKe_LopTC(DSLopTC &DSLTC)
+string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
+{
+    if (DSMH == NULL)
+    {
+        return "";
+    }
+    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0)
+    {
+        return DSMH->mh.TENMH;
+    }
+    if (mamh < DSMH->mh.MAMH)
+    {
+        return SearchTenMH_MAMH(DSMH->left, mamh);
+    }
+    if (mamh > DSMH->mh.MAMH)
+    {
+        return SearchTenMH_MAMH(DSMH->right, mamh);
+    }
+}
+
+void LietKe_LopTC(DSLopTC &DSLTC, TreeMH &DSMH)
 {
     cout << "--- DANH SACH LOP TIN CHI ---\n";
-    cout << "--------------------------------------------------------------------------------------\n";
-    cout << "MaLTC\tMaMH\tNienKhoa\tHocKy\tNhom\tMinSV\tMaxSV\tSoLuongSVDangKy\tHuyLop\n";
-    cout << "--------------------------------------------------------------------------------------\n";
+    cout << "------------------------------------------------------------------------------------------------------------------\n";
+    cout << left
+         << setw(8) << "MaLTC"
+         << setw(10) << "MaMH"
+         << setw(35) << "TenMH"
+         << setw(12) << "NienKhoa"
+         << setw(7) << "HocKy"
+         << setw(6) << "Nhom"
+         << setw(7) << "MinSV"
+         << setw(7) << "MaxSV"
+         << setw(16) << "SoLuongDK"
+         << setw(8) << "HuyLop"
+         << "\n";
+    cout << "------------------------------------------------------------------------------------------------------------------\n";
     for (int i = 0; i < DSLTC.n; i++)
     {
         LopTC *ltc = DSLTC.nodes[i];
-        cout << ltc->MALOPTC << "\t"
-             << ltc->MAMH << "\t"
-             << ltc->NIENKHOA << "\t"
-             << ltc->HOCKY << "\t"
-             << ltc->NHOM << "\t"
-             << ltc->MINSV << "\t"
-             << ltc->MAXSV << "\t"
-             << ltc->SLSVDK << "\t\t"
-             << (ltc->HUYLOP ? "Yes" : "No") << "\n";
+        string tenmh = SearchTenMH_MAMH(DSMH, ltc->MAMH);
+        cout << left
+             << setw(8) << ltc->MALOPTC
+             << setw(10) << ltc->MAMH
+             << setw(35) << tenmh
+             << setw(12) << ltc->NIENKHOA
+             << setw(7) << ltc->HOCKY
+             << setw(6) << ltc->NHOM
+             << setw(7) << ltc->MINSV
+             << setw(7) << ltc->MAXSV
+             << setw(16) << ltc->SLSVDK
+             << setw(8) << (ltc->HUYLOP ? "Yes" : "No")
+             << "\n";
     }
 }
 
@@ -409,26 +449,6 @@ void InDSSV_LopTC(DSLopTC &DSLTC, DSLopSV &DSLSV)
             cout << node->sv.MASV << "\t" << node->sv.HO << "\t" << node->sv.TEN << "\t\t" << node->sv.GIOITINH << "\t\t" << node->sv.SODT << "\t" << node->sv.EMAIL << "\n";
         }
         p = p->next;
-    }
-}
-
-string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
-{
-    if (DSMH == NULL)
-    {
-        return "";
-    }
-    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0)
-    {
-        return DSMH->mh.TENMH;
-    }
-    if (mamh < DSMH->mh.MAMH)
-    {
-        return SearchTenMH_MAMH(DSMH->left, mamh);
-    }
-    if (mamh > DSMH->mh.MAMH)
-    {
-        return SearchTenMH_MAMH(DSMH->right, mamh);
     }
 }
 
@@ -1505,8 +1525,16 @@ void DocFile_DSMH(TreeMH &DSMH)
         return;
     }
     string line;
-    while (getline(in, line))
+    if (!getline(in, line))
     {
+        cout << "File rong hoac sai dinh dang\n";
+        return;
+    }
+    int soMonHoc = stoi(line);
+    for (int i = 0; i < soMonHoc; ++i)
+    {
+        if (!getline(in, line))
+            break;
         stringstream ss(line);
         string MAMH, TENMH, STCLT, STCTH;
         getline(ss, MAMH, ',');
@@ -1559,35 +1587,47 @@ void DocFile_DSLSV(DSLopSV &DSLSV)
     }
     string line;
     LopSV *lopHienTai = NULL;
-    while (getline(in, line))
+    if (!getline(in, line))
     {
-        if (!line.empty() && (line[0] == ' '))
+        cout << "File rong hoac sai dinh dang\n";
+        return;
+    }
+    int soLop = stoi(line);
+    for (int i = 0; i < soLop; ++i)
+    {
+        if (!getline(in, line))
+            break;
+        stringstream ss(line);
+        string MALOP, TENLOP;
+        getline(ss, MALOP, ',');
+        getline(ss, TENLOP);
+        LopSV lop;
+        lop.MALOP = MALOP;
+        lop.TENLOP = TENLOP;
+        if (!getline(in, line))
+            break;
+        lop.SLSV = stoi(line);
+        lop.FirstSV = NULL;
+        lopHienTai = &DSLSV.nodes[DSLSV.n];
+        *lopHienTai = lop;
+        for (int j = 0; j < lop.SLSV; ++j)
         {
-            if (lopHienTai == NULL)
-                continue;
+            if (!getline(in, line))
+                break;
             line = line.substr(5);
-            stringstream ss(line);
+            stringstream svStream(line);
             SinhVien sv;
-            getline(ss, sv.MASV, ',');
-            getline(ss, sv.HO, ',');
-            getline(ss, sv.TEN, ',');
-            getline(ss, sv.GIOITINH, ',');
-            getline(ss, sv.SODT, ',');
-            getline(ss, sv.EMAIL, ',');
+            getline(svStream, sv.MASV, ',');
+            getline(svStream, sv.HO, ',');
+            getline(svStream, sv.TEN, ',');
+            getline(svStream, sv.GIOITINH, ',');
+            getline(svStream, sv.SODT, ',');
+            getline(svStream, sv.EMAIL, ',');
+
             ThemSinhVienVaoLop(lopHienTai->FirstSV, sv);
         }
-        else
-        {
-            stringstream ss(line);
-            string MALOP, TENLOP;
-            getline(ss, MALOP, ',');
-            getline(ss, TENLOP);
-            DSLSV.nodes[DSLSV.n].MALOP = MALOP;
-            DSLSV.nodes[DSLSV.n].TENLOP = TENLOP;
-            DSLSV.nodes[DSLSV.n].FirstSV = NULL;
-            lopHienTai = &DSLSV.nodes[DSLSV.n];
-            DSLSV.n++;
-        }
+
+        DSLSV.n++;
     }
     in.close();
 }
@@ -1601,46 +1641,46 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
         return;
     }
     string line;
-    LopTC *ltc = NULL;
-    while (getline(in, line))
+    getline(in, line);
+    int tongSoLop = stoi(line);
+    for (int i = 0; i < tongSoLop; ++i)
     {
-        if (line.empty())
-            continue;
+        if (!getline(in, line))
+            break;
         stringstream ss(line);
-        string firstToken;
-        getline(ss, firstToken, ',');
-        if (isdigit(firstToken[0]))
+        string MALOPTC, MAMH, NIENKHOA, HOCKY, NHOM, MINSV, MAXSV, SLSVDK, HUYLOP;
+        getline(ss, MALOPTC, ',');
+        getline(ss, MAMH, ',');
+        getline(ss, NIENKHOA, ',');
+        getline(ss, HOCKY, ',');
+        getline(ss, NHOM, ',');
+        getline(ss, MINSV, ',');
+        getline(ss, MAXSV, ',');
+        getline(ss, SLSVDK, ',');
+        getline(ss, HUYLOP, ',');
+        LopTC *ltc = new LopTC;
+        ltc->MALOPTC = stoi(MALOPTC);
+        ltc->MAMH = MAMH;
+        ltc->NIENKHOA = NIENKHOA;
+        ltc->HOCKY = stoi(HOCKY);
+        ltc->NHOM = stoi(NHOM);
+        ltc->MINSV = stoi(MINSV);
+        ltc->MAXSV = stoi(MAXSV);
+        ltc->SLSVDK = stoi(SLSVDK);
+        ltc->HUYLOP = (HUYLOP == "Yes");
+        ltc->DSDK = NULL;
+        if (!getline(in, line))
+            break;
+        int soSV = stoi(line);
+        for (int j = 0; j < soSV; ++j)
         {
-            ss.clear();
-            ss.str(line);
-            string MALOPTC, MAMH, NIENKHOA, HOCKY, NHOM, MINSV, MAXSV, SLSVDK, HUYLOP;
-            getline(ss, MALOPTC, ',');
-            getline(ss, MAMH, ',');
-            getline(ss, NIENKHOA, ',');
-            getline(ss, HOCKY, ',');
-            getline(ss, NHOM, ',');
-            getline(ss, MINSV, ',');
-            getline(ss, MAXSV, ',');
-            getline(ss, SLSVDK, ',');
-            getline(ss, HUYLOP, ',');
-            ltc = new LopTC;
-            ltc->MALOPTC = stoi(MALOPTC);
-            ltc->MAMH = MAMH;
-            ltc->NIENKHOA = NIENKHOA;
-            ltc->HOCKY = stoi(HOCKY);
-            ltc->NHOM = stoi(NHOM);
-            ltc->MINSV = stoi(MINSV);
-            ltc->MAXSV = stoi(MAXSV);
-            ltc->SLSVDK = stoi(SLSVDK);
-            ltc->HUYLOP = (HUYLOP == "Yes");
-            ltc->DSDK = NULL;
-            DSLTC.nodes[DSLTC.n++] = ltc;
-        }
-        else if (ltc != NULL)
-        {
-            string MASV = firstToken.substr(5);
-            string DIEM_STR;
-            getline(ss, DIEM_STR, ',');
+            if (!getline(in, line))
+                break;
+            line = line.substr(5);
+            stringstream svStream(line);
+            string MASV, DIEM_STR;
+            getline(svStream, MASV, ',');
+            getline(svStream, DIEM_STR, ',');
             float DIEM = stof(DIEM_STR);
             PTRDK newNode = new NodeDK;
             newNode->dk.MASV = MASV;
@@ -1658,6 +1698,7 @@ void DocFile_DSLTC(DSLopTC &DSLTC)
                 last->next = newNode;
             }
         }
+        DSLTC.nodes[DSLTC.n++] = ltc;
     }
     in.close();
 }
@@ -1826,7 +1867,7 @@ int main()
             Them_LopTC(DSLTC);
             break;
         case 2:
-            LietKe_LopTC(DSLTC);
+            LietKe_LopTC(DSLTC, DSMH);
             break;
         case 3:
             Xoa_LopTC(DSLTC);

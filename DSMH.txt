@@ -1,3 +1,4 @@
+20
 BAS1150,Triet Hoc Mac-Lenin,30,0
 BAS1153,Lich Su Dang CSVN,25,0
 BAS1157,Tieng Anh,25,0
