@@ -229,7 +229,27 @@ void LietKe_DSSV(DSLopSV &DSLSV)
     }
 }
 
-void Them_LopTC(DSLopTC &DSLTC)
+string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
+{
+    if (DSMH == NULL)
+    {
+        return "";
+    }
+    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0)
+    {
+        return DSMH->mh.TENMH;
+    }
+    if (mamh < DSMH->mh.MAMH)
+    {
+        return SearchTenMH_MAMH(DSMH->left, mamh);
+    }
+    if (mamh > DSMH->mh.MAMH)
+    {
+        return SearchTenMH_MAMH(DSMH->right, mamh);
+    }
+}
+
+void Them_LopTC(DSLopTC &DSLTC, TreeMH &DSMH)
 {
     if (DSLTC.n >= MAX_LOPTC)
     {
@@ -239,6 +259,7 @@ void Them_LopTC(DSLopTC &DSLTC)
     LopTC *ltc = new LopTC;
     cout << "Nhap ma mon hoc: ";
     cin >> ltc->MAMH;
+    cout << "Ten mon hoc: " << SearchTenMH_MAMH(DSMH, ltc->MAMH) << "\n";
     cout << "Nhap nien khoa: ";
     cin >> ltc->NIENKHOA;
     cout << "Nhap hoc ky: ";
@@ -343,26 +364,6 @@ void Xoa_LopTC(DSLopTC &DSLTC)
     }
     DSLTC.n--;
     cout << "Da xoa lop tin chi co ma " << ltc->MALOPTC << " thanh cong!\n";
-}
-
-string SearchTenMH_MAMH(TreeMH &DSMH, string mamh)
-{
-    if (DSMH == NULL)
-    {
-        return "";
-    }
-    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0)
-    {
-        return DSMH->mh.TENMH;
-    }
-    if (mamh < DSMH->mh.MAMH)
-    {
-        return SearchTenMH_MAMH(DSMH->left, mamh);
-    }
-    if (mamh > DSMH->mh.MAMH)
-    {
-        return SearchTenMH_MAMH(DSMH->right, mamh);
-    }
 }
 
 void LietKe_LopTC(DSLopTC &DSLTC, TreeMH &DSMH)
@@ -1873,7 +1874,7 @@ int main()
         switch (choice)
         {
         case 1:
-            Them_LopTC(DSLTC);
+            Them_LopTC(DSLTC, DSMH);
             break;
         case 2:
             LietKe_LopTC(DSLTC, DSMH);
