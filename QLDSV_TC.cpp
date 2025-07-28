@@ -1807,7 +1807,7 @@ void GhiFile_DSLTC(DSLopTC &DSLTC)
         int stt = 1;
         while (p != NULL)
         {
-            out << "     " << stt++ << p->dk.MASV << "," << fixed << setprecision(1) << p->dk.DIEM << "\n";
+            out << "     " << p->dk.MASV << "," << fixed << setprecision(1) << p->dk.DIEM << "\n";
             p = p->next;
         }
     }
