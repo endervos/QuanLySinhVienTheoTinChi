@@ -673,19 +673,7 @@ void HieuChinh_LopSV(DSLopSV &DSLSV)
     cout << "Hieu chinh thanh cong!\n";
 }
 
-PTRSV Tim_SV_Theo_MASV(PTRSV DSSVGlobal, string masv)
-{
-    for (PTRSV p = DSSVGlobal; p != NULL; p = p->next)
-    {
-        if (p->sv.MASV == masv)
-        {
-            return p;
-        }
-    }
-    return NULL;
-}
-
-bool Kiem_Tra_SV_Ton_Tai(PTRSV FirstSV, string masv)
+bool KiemTra_SV(PTRSV FirstSV, string masv)
 {
     for (PTRSV p = FirstSV; p != NULL; p = p->next)
     {
@@ -697,7 +685,7 @@ bool Kiem_Tra_SV_Ton_Tai(PTRSV FirstSV, string masv)
     return false;
 }
 
-void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, PTRSV DSSVGlobal)
+void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, DSLopSV DSLSV)
 {
     string masv;
     cout << "Nhap ma sinh vien (0 de dung nhap): ";
@@ -712,7 +700,7 @@ void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, PTRSV DSSVGlobal)
 
         masv = ChuanHoa_Chuoi(masv, 15);
 
-        PTRSV svTim = Tim_SV_Theo_MASV(DSSVGlobal, masv);
+        PTRSV svTim = SearchSV_MASV(DSLSV, masv);
         if (svTim == NULL)
         {
             cout << "Khong tim thay sinh vien co ma: " << masv << "\n";
@@ -720,7 +708,7 @@ void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, PTRSV DSSVGlobal)
             continue;
         }
 
-        if (Kiem_Tra_SV_Ton_Tai(FirstSV, masv))
+        if (KiemTra_SV(FirstSV, masv))
         {
             cout << "Sinh vien da ton tai trong lop!\n";
             cout << "Nhap ma sinh vien (de trong de dung nhap): ";
@@ -750,7 +738,7 @@ void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, PTRSV DSSVGlobal)
     }
 }
 
-void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV DSSVGlobal)
+void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV FirstSV)
 {
     if (DSLSV.n == 0)
     {
@@ -758,7 +746,7 @@ void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV DSSVGlobal)
         return;
     }
 
-    if (DSSVGlobal == NULL)
+    if (FirstSV == NULL)
     {
         cout << "Danh sach sinh vien tong rong!\n";
         return;
@@ -775,7 +763,7 @@ void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV DSSVGlobal)
         return;
     }
     cout << "Nhap sinh vien vao lop " << DSLSV.nodes[pos].TENLOP << ":\n";
-    Nhap_DSSV_TheoMSSV(DSLSV.nodes[pos].FirstSV, DSSVGlobal);
+    Nhap_DSSV_TheoMSSV(DSLSV.nodes[pos].FirstSV, DSLSV);
 }
 
 void LietKe_LopSV(DSLopSV &DSLSV)
