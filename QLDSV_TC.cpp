@@ -131,7 +131,7 @@ string ChuanHoa_Chuoi(string &chuoi, int dodai)
     return ketqua;
 }
 
-string ChuanHoa_InputNangCao(string chuoi, int dodai, bool toUpper)
+string ChuanHoa_InputNangCao(string chuoi, int dodai, bool toUpper = false, bool vietHoaDau = false)
 {
     size_t start = 0;
     while (start < chuoi.length() && isspace(static_cast<unsigned char>(chuoi[start])))
@@ -163,6 +163,20 @@ string ChuanHoa_InputNangCao(string chuoi, int dodai, bool toUpper)
         for (char &c : ketqua)
             c = toupper(c);
     }
+    if (vietHoaDau) {
+    bool capitalize = true;
+    for (char &c : ketqua)
+	{
+        if (isspace(c)) {
+            capitalize = true;
+        } else if (capitalize && isalpha(c)) {
+            c = toupper(c);
+            capitalize = false;
+        } else {
+            c = tolower(c);
+        }
+    }
+}
     return ChuanHoa_Chuoi(ketqua, dodai);
 }
 
