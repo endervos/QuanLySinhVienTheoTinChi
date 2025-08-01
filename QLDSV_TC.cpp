@@ -1216,27 +1216,22 @@ void InDiemTongKet(DSLopSV &DSLSV, DSLopTC &DSLTC, TreeMH &DSMH)
 /*Tài*/
 
 /*Tân*/
-NodeMH *TaoNodeMH(MonHoc mh)
-{
-    NodeMH *p = new NodeMH;
-    p->mh = mh;
-    p->left = NULL;
-    p->right = NULL;
-    return p;
-}
-
-void ChenNodeMH(TreeMH &DSMH, MonHoc mh)
+void ChenNodeMH(TreeMH &DSMH, const MonHoc &mh)
 {
     if (DSMH == NULL)
     {
-        DSMH = TaoNodeMH(mh);
+        DSMH = new NodeMH;
+        DSMH->mh = mh;
+        DSMH->left = NULL;
+        DSMH->right = NULL;
         return;
     }
-    if (SoSanh_Chuoi(mh.MAMH, DSMH->mh.MAMH) < 0)
+    int cmp = strcasecmp(mh.MAMH.c_str(), DSMH->mh.MAMH.c_str());
+    if (cmp < 0)
     {
         ChenNodeMH(DSMH->left, mh);
     }
-    else if (SoSanh_Chuoi(mh.MAMH, DSMH->mh.MAMH) > 0)
+    else if (cmp > 0)
     {
         ChenNodeMH(DSMH->right, mh);
     }
@@ -1246,84 +1241,98 @@ void ChenNodeMH(TreeMH &DSMH, MonHoc mh)
     }
 }
 
-string NhapSoNguyen(int maxDigits = 3){
-	string input = "";
-	char c;
-	while (true){
-		c = _getch();
-		if(c==13) break;
-		else if (c == 8 && !input.empty()){
-			input.pop_back();
-			cout<<"\b \b";
-		}
-		else if (isdigit(c) && (int)input.length() < maxDigits){
-			input += c;
-			cout << c;
-		}
-	}
-	cout << endl;
-	return input;
-} 
+string NhapSoNguyen(int maxDigits = 3) {
+    string input = "";
+    char c;
+    while (true) {
+        c = _getch();
+        if (c == 13) break; // Enter
+        else if (c == 8 && !input.empty()) { // Backspace
+            input.pop_back();
+            cout << "\b \b";
+        }
+        else if (isdigit(static_cast<unsigned char>(c)) && (int)input.size() < maxDigits) {
+            input += c;
+            cout << c;
+        }
+    }
+    cout << endl;
+    return input;
+}
+
+NodeMH* TimMH_MAMH(TreeMH DSMH, string mamh)
+{
+    if (!DSMH) return NULL;
+    int cmp = strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str());
+    if (cmp == 0) return DSMH;
+    if (cmp > 0) return TimMH_MAMH(DSMH->left, mamh);
+    return TimMH_MAMH(DSMH->right, mamh);
+}
 
 TreeMH Search_MH(TreeMH root, string mamh) {
-    if (root == NULL) return NULL;
-    if (strcasecmp(root->mh.MAMH.c_str(), mamh.c_str()) == 0) return root;
-    if (mamh < root->mh.MAMH) return Search_MH(root->left, mamh);
-    else return Search_MH(root->right, mamh);
+    return TimMH_MAMH(root, mamh);
 }
 
 TreeMH Insert_MH(TreeMH root, MonHoc mh) {
-    if (root == NULL) {
-        TreeMH newNode = new NodeMH;
-        newNode->mh = mh;
-        newNode->left = newNode->right = NULL;
-        return newNode;
-    }
-    if (mh.MAMH < root->mh.MAMH) root->left = Insert_MH(root->left, mh);
-    else if (mh.MAMH > root->mh.MAMH) root->right = Insert_MH(root->right, mh);
+    ChenNodeMH(root, mh);
     return root;
 }
+
 void Them_MonHoc(TreeMH &DSMH)
 {
     MonHoc mh;
-    cout << "Nhap ma mon hoc: ";
-    cin >> mh.MAMH;
-    mh.MAMH = ChuanHoa_Chuoi(mh.MAMH, 10);
-    // Kiem tra trung ma mon hoc
-    NodeMH *temp = DSMH;
-    while (temp != NULL)
-    {
-        if (strcasecmp(temp->mh.MAMH.c_str(), mh.MAMH.c_str()) == 0)
-        {
-            cout << "Ma mon hoc da ton tai!\n";
-            return;
+    string input;
+    while (true) {
+        cout << "Nhap ma mon hoc: ";
+        getline(cin, mh.MAMH);
+        mh.MAMH = ChuanHoa_InputNangCao(mh.MAMH, 10, true, false);
+        if (mh.MAMH.empty()) {
+            cout << "Ma mon hoc khong duoc rong!\n";
+            continue;
         }
-        if (SoSanh_Chuoi(mh.MAMH, temp->mh.MAMH) < 0)
-            temp = temp->left;
-        else
-            temp = temp->right;
+        if (!KiemTra_ChuaChuVaSo(mh.MAMH)) {
+            cout << "Ma mon hoc phai chua it nhat 1 chu va 1 so!\n";
+            continue;
+        }
+        if (Search_MH(DSMH, mh.MAMH) != NULL) {
+            cout << "Ma mon hoc da ton tai! Vui long nhap lai.\n";
+            continue;
+        }
+        break;
     }
-    cout << "Nhap ten mon hoc: ";
-    cin.ignore(1000, '\n');
-    getline(cin, mh.TENMH);
-    mh.TENMH = ChuanHoa_Chuoi(mh.TENMH, 50);
-    cout << "Nhap so tin chi ly thuyet: ";
-    cin >> mh.STCLT;
-    cout << "Nhap so tin chi thuc hanh: ";
-    cin >> mh.STCTH;
-    ChenNodeMH(DSMH, mh);
-    cout << "Them mon hoc thanh cong!\n";
-}
+    while (true) {
+        cout << "Nhap ten mon hoc: ";
+        getline(cin, mh.TENMH);
+        mh.TENMH = ChuanHoa_InputNangCao(mh.TENMH, 50, false, true);
 
-NodeMH *TimMH_MAMH(TreeMH DSMH, string mamh)
-{
-    if (DSMH == NULL)
-        return NULL;
-    if (strcasecmp(DSMH->mh.MAMH.c_str(), mamh.c_str()) == 0)
-        return DSMH;
-    if (SoSanh_Chuoi(mamh, DSMH->mh.MAMH) < 0)
-        return TimMH_MAMH(DSMH->left, mamh);
-    return TimMH_MAMH(DSMH->right, mamh);
+        if (mh.TENMH.empty()) {
+            cout << "Ten mon hoc khong duoc rong!\n";
+            continue;
+        }
+        break;
+    }
+    while (true) {
+        cout << "Nhap so tin chi ly thuyet: ";
+        input = NhapSoNguyen(2);
+        if (input.empty()) {
+            cout << "Vui long nhap it nhat 1 chu so!\n";
+            continue;
+        }
+        mh.STCLT = stoi(input);
+        break;
+    }
+    while (true) {
+        cout << "Nhap so tin chi thuc hanh: ";
+        input = NhapSoNguyen(2);
+        if (input.empty()) {
+            cout << "Vui long nhap it nhat 1 chu so!\n";
+            continue;
+        }
+        mh.STCTH = stoi(input);
+        break;
+    }
+    DSMH = Insert_MH(DSMH, mh);
+    cout << "Them mon hoc thanh cong!\n";
 }
 
 void HieuChinh_MonHoc(TreeMH &DSMH)
@@ -1351,11 +1360,13 @@ void HieuChinh_MonHoc(TreeMH &DSMH)
     cout << "Nhap ten mon hoc moi: ";
     cin.ignore(1000, '\n');
     getline(cin, node->mh.TENMH);
-    node->mh.TENMH = ChuanHoa_Chuoi(node->mh.TENMH, 50);
+    node->mh.TENMH = ChuanHoa_InputNangCao(node->mh.TENMH, 50, false, true);
     cout << "Nhap so tin chi ly thuyet moi: ";
-    cin >> node->mh.STCLT;
+    string input = NhapSoNguyen(2);
+    if(!input.empty()) node->mh.STCLT = stoi(input);
     cout << "Nhap so tin chi thuc hanh moi: ";
-    cin >> node->mh.STCTH;
+    input = NhapSoNguyen(2);
+    if(!input.empty()) node->mh.STCTH = stoi(input);
     cout << "Hieu chinh mon hoc thanh cong!\n";
 }
 
@@ -1452,7 +1463,6 @@ void Xoa_MonHoc(TreeMH &DSMH)
     cout << "Xoa mon hoc thanh cong!\n";
 }
 
-// Luu tam thoi
 struct DSMHArray
 {
     MonHoc *nodes;
