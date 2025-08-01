@@ -1246,6 +1246,43 @@ void ChenNodeMH(TreeMH &DSMH, MonHoc mh)
     }
 }
 
+string NhapSoNguyen(int maxDigits = 3){
+	string input = "";
+	char c;
+	while (true){
+		c = _getch();
+		if(c==13) break;
+		else if (c == 8 && !input.empty()){
+			input.pop_back();
+			cout<<"\b \b";
+		}
+		else if (isdigit(c) && (int)input.length() < maxDigits){
+			input += c;
+			cout << c;
+		}
+	}
+	cout << endl;
+	return input;
+} 
+
+TreeMH Search_MH(TreeMH root, string mamh) {
+    if (root == NULL) return NULL;
+    if (strcasecmp(root->mh.MAMH.c_str(), mamh.c_str()) == 0) return root;
+    if (mamh < root->mh.MAMH) return Search_MH(root->left, mamh);
+    else return Search_MH(root->right, mamh);
+}
+
+TreeMH Insert_MH(TreeMH root, MonHoc mh) {
+    if (root == NULL) {
+        TreeMH newNode = new NodeMH;
+        newNode->mh = mh;
+        newNode->left = newNode->right = NULL;
+        return newNode;
+    }
+    if (mh.MAMH < root->mh.MAMH) root->left = Insert_MH(root->left, mh);
+    else if (mh.MAMH > root->mh.MAMH) root->right = Insert_MH(root->right, mh);
+    return root;
+}
 void Them_MonHoc(TreeMH &DSMH)
 {
     MonHoc mh;
