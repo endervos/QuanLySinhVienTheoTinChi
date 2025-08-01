@@ -197,14 +197,27 @@ bool KiemTra_Email(string email)
     return at != string::npos && dot != string::npos && dot > at;
 }
 
-bool KiemTra_TrungMaSV(PTRSV FirstSV, string masv)
-{
-    for (PTRSV p = FirstSV; p != NULL; p = p->next)
-        if (strcasecmp(p->sv.MASV.c_str(), masv.c_str()) == 0)
-            return true;
-    return false;
+// bool KiemTra_TrungMaSV(PTRSV FirstSV, string masv)
+// {
+//     for (PTRSV p = FirstSV; p != NULL; p = p->next)
+//         if (strcasecmp(p->sv.MASV.c_str(), masv.c_str()) == 0)
+//             return true;
+//     return false;
+// }
+bool KiemTra_ChuaChuVaSo(string s) {
+    bool coChu = false, coSo = false;
+    for (char c : s) {
+        if (isalpha(c)) coChu = true;
+        if (isdigit(c)) coSo = true;
+    }
+    return coChu && coSo;
 }
 
+bool isNumber(string s) {
+    for (char c : s)
+        if (!isdigit(c)) return false;
+    return !s.empty();
+}
 /*Tiến*/
 PTRSV SearchSV_MASV(DSLopSV &DSLSV, string msv)
 {
