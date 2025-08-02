@@ -1084,7 +1084,7 @@ void InDiemTB_KhoaHoc(DSLopSV &DSLSV, DSLopTC &DSLTC, TreeMH &DSMH)
     }
 }*/
 
-void InDiemTongKet(DSLopSV &DSLSV, DSLopTC &DSLTC, TreeMH &DSMH)
+void InDiemTongKet(DSLopSV &DSLSV, DSLopTC &DSLTC)
 {
     string malop;
     cout << "Nhap ma lop sinh vien: ";
@@ -2003,7 +2003,7 @@ int main()
             // InDiemTB_LopTC(DSLTC, DSMH);
             break;
         case 24:
-            InDiemTongKet(DSLSV, DSLTC, DSMH);
+            InDiemTongKet(DSLSV, DSLTC);
             break;
         case 25:
             InBangDiem_LopTC(DSLTC, DSMH, DSLSV);
