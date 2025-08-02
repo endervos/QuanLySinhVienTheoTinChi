@@ -580,6 +580,7 @@ void DangKy_LopTC(DSLopTC &DSLTC, TreeMH &DSMH, DSLopSV &DSLSV)
 /*Tiến*/
 
 /*Tài*/
+
 int Tim_LopSV(DSLopSV &DSLSV, string malop)
 {
     for (int i = 0; i < DSLSV.n; i++)
@@ -632,6 +633,7 @@ void Them_LopSV(DSLopSV &DSLSV)
     getline(cin, tenlop);
     DSLSV.nodes[DSLSV.n].MALOP = malop;
     DSLSV.nodes[DSLSV.n].TENLOP = tenlop;
+    DSLSV.nodes[DSLSV.n].SLSV = 0;
     DSLSV.nodes[DSLSV.n].FirstSV = NULL;
     DSLSV.n++;
     cout << "Them lop sinh vien thanh cong!\n";
@@ -666,6 +668,8 @@ void Xoa_LopSV(DSLopSV &DSLSV)
         return;
     }
     Xoa_SV_LopSV(DSLSV.nodes[pos].FirstSV);
+    DSLSV.nodes[pos].SLSV = 0;
+    
     for (int i = pos; i < DSLSV.n - 1; i++)
     {
         DSLSV.nodes[i] = DSLSV.nodes[i + 1];
@@ -694,6 +698,7 @@ void HieuChinh_LopSV(DSLopSV &DSLSV)
     cout << "Thong tin hien tai:\n";
     cout << "Ma lop: " << DSLSV.nodes[pos].MALOP << "\n";
     cout << "Ten lop: " << DSLSV.nodes[pos].TENLOP << "\n";
+    cout << "So luong sinh vien: " << DSLSV.nodes[pos].SLSV << "\n";
     cout << "Nhap ten lop moi: ";
     cin.ignore();
     getline(cin, DSLSV.nodes[pos].TENLOP);
@@ -712,7 +717,7 @@ bool KiemTra_SV(PTRSV FirstSV, string masv)
     return false;
 }
 
-void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, DSLopSV DSLSV)
+void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, int &SLSV, DSLopSV &DSLSV)
 {
     string masv;
     cout << "Nhap ma sinh vien (0 de dung nhap): ";
@@ -727,18 +732,31 @@ void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, DSLopSV DSLSV)
 
         masv = ChuanHoa_Chuoi(masv, 15);
 
-        PTRSV svTim = SearchSV_MASV(DSLSV, masv);
+        // Tìm sinh viên trong tất cả các lớp của DSLSV
+        PTRSV svTim = NULL;
+        for (int i = 0; i < DSLSV.n && svTim == NULL; i++)
+        {
+            for (PTRSV p = DSLSV.nodes[i].FirstSV; p != NULL; p = p->next)
+            {
+                if (p->sv.MASV == masv)
+                {
+                    svTim = p;
+                    break;
+                }
+            }
+        }
+
         if (svTim == NULL)
         {
             cout << "Khong tim thay sinh vien co ma: " << masv << "\n";
-            cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+            cout << "Nhap ma sinh vien (0 de dung nhap): ";
             continue;
         }
 
         if (KiemTra_SV(FirstSV, masv))
         {
             cout << "Sinh vien da ton tai trong lop!\n";
-            cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+            cout << "Nhap ma sinh vien (0 de dung nhap): ";
             continue;
         }
 
@@ -760,22 +778,17 @@ void Nhap_DSSV_TheoMSSV(PTRSV &FirstSV, DSLopSV DSLSV)
             q->next = p;
         }
 
+        SLSV++;
         cout << "Da them sinh vien: " << svTim->sv.HO << " " << svTim->sv.TEN << "\n";
-        cout << "Nhap ma sinh vien (de trong de dung nhap): ";
+        cout << "Nhap ma sinh vien (0 de dung nhap): ";
     }
 }
 
-void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV FirstSV)
+void Nhap_SV_Lop(DSLopSV &DSLSV)
 {
     if (DSLSV.n == 0)
     {
         cout << "Danh sach lop sinh vien rong!\n";
-        return;
-    }
-
-    if (FirstSV == NULL)
-    {
-        cout << "Danh sach sinh vien tong rong!\n";
         return;
     }
 
@@ -790,7 +803,7 @@ void Nhap_SV_Lop(DSLopSV &DSLSV, PTRSV FirstSV)
         return;
     }
     cout << "Nhap sinh vien vao lop " << DSLSV.nodes[pos].TENLOP << ":\n";
-    Nhap_DSSV_TheoMSSV(DSLSV.nodes[pos].FirstSV, DSLSV);
+    Nhap_DSSV_TheoMSSV(DSLSV.nodes[pos].FirstSV, DSLSV.nodes[pos].SLSV, DSLSV);
 }
 
 void LietKe_LopSV(DSLopSV &DSLSV)
@@ -806,16 +819,10 @@ void LietKe_LopSV(DSLopSV &DSLSV)
     cout << "-------------------------------------------------------------\n";
     for (int i = 0; i < DSLSV.n; i++)
     {
-        int count = 0;
-        for (PTRSV p = DSLSV.nodes[i].FirstSV; p != NULL; p = p->next)
-        {
-            count++;
-        }
-
         cout << (i + 1) << "\t"
              << DSLSV.nodes[i].MALOP << "\t\t"
              << DSLSV.nodes[i].TENLOP << "\t\t"
-             << count << "\n";
+             << DSLSV.nodes[i].SLSV << "\n";
     }
 }
 
@@ -893,7 +900,9 @@ void In_DSSV_Lop_SapXep(DSLopSV &DSLSV)
         cout << "Lop khong co sinh vien nao!\n";
         return;
     }
+    
     SapXep_DSSV_TenHo(DSLSV.nodes[pos].FirstSV);
+    
     cout << "--- DANH SACH SINH VIEN LOP " << DSLSV.nodes[pos].TENLOP << " (sap xep theo ten+ho) ---\n";
     cout << "-------------------------------------------------------------\n";
     cout << "STT\tMaSV\t\tHo\t\tTen\tGioiTinh\tSoDT\t\tEmail\n";
@@ -1952,7 +1961,7 @@ int main()
             HieuChinh_LopSV(DSLSV);
             break;
         case 10:
-            Nhap_SV_Lop(DSLSV, FirstSV);
+            Nhap_SV_Lop(DSLSV);
             break;
         case 11:
             LietKe_LopSV(DSLSV);
